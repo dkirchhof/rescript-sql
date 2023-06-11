@@ -21,8 +21,8 @@ module ArtistsTable = {
   let table: t = {
     name: "artists",
     columns: {
-      id: Column.make({name: "id", type_: "INTEGER"}),
-      name: Column.make({name: "name", type_: "TEXT"}),
+      id: Node.makeColumn({name: "id", type_: "INTEGER"}),
+      name: Node.makeColumn({name: "name", type_: "TEXT"}),
     },
   }
 }
@@ -51,9 +51,9 @@ module SongsTable = {
   let table: t = {
     name: "songs",
     columns: {
-      id: Column.make({name: "id", type_: "INTEGER"}),
-      artistId: Column.make({name: "artistId", type_: "INTEGER"}),
-      name: Column.make({name: "name", type_: "TEXT"}),
+      id: Node.makeColumn({name: "id", type_: "INTEGER"}),
+      artistId: Node.makeColumn({name: "artistId", type_: "INTEGER"}),
+      name: Node.makeColumn({name: "name", type_: "TEXT"}),
     },
   }
 }
@@ -108,3 +108,19 @@ from(ArtistsTable.table)
   }
 )
 ->log
+
+from(ArtistsTable.table)
+->S1.where(c =>
+  eq(
+    c.id,
+    from(ArtistsTable.table)->S1.selectSingle(c => c.id),
+  )
+)
+->S1.select(c =>
+  {
+    "id": c.id,
+    "name": c.name,
+  }
+)
+->log
+

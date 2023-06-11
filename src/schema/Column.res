@@ -4,5 +4,3 @@ type t = {
   tableAlias?: string,
   columnAlias?: string,
 }
-
-external make: t => 'a = "%identity"

@@ -1,16 +1,14 @@
-let mapColumns = (columns: 'a, fn): 'a => {
-  let columns: Dict.t<Column.t> = Obj.magic(columns)
+let getColumnsWithTableAlias = (columns: 'a, tableAlias): 'a => {
+  let columns: Dict.t<Node.t<_>> = Obj.magic(columns)
 
   columns
   ->Dict.toArray
-  // ->Array.map(((columnName, column)) => (
-  //   columnName,
-  //   {
-  //     ...column,
-  //     tableAlias,
-  //   },
-  // ))
-  ->Array.map(((columnName, column)) => (columnName, fn(column)))
+  ->Array.map(((columnName, column)) => {
+    switch column {
+    | Column(column) => (columnName, Node.Column({...column, tableAlias}))
+    | _ => panic("only available for columns")
+    }
+  })
   ->Dict.fromArray
   ->Obj.magic
 }
