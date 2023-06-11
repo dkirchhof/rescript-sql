@@ -77,6 +77,8 @@ let log: 'a => unit = %raw(`
 open Select
 open Expr
 
+from(ArtistsTable.table)->S1.where(c => eq(c.id, 1))->S1.selectAll->log
+
 from(ArtistsTable.table)
 ->S1.where(c => eq(c.id, 1))
 ->S1.select(c =>

@@ -135,6 +135,13 @@ module S1 = {
     projection: q.from.columns->getProjection,
   })
 
+  let selectAll = (q: t<'p1, _>) => Query.Select({
+    from: {name: q.from.name, alias: q.from.alias},
+    joins: [],
+    where: q.where,
+    projection: q.from.columns,
+  })
+
   let toSubquery = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p => Node.makeSubquery({
     from: {name: q.from.name, alias: q.from.alias},
     joins: [],
