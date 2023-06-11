@@ -51,10 +51,31 @@ module S2 = {
       },
     ],
     where: q.where,
-    projection: Obj.magic({
-      t1: q.from.columns,
-      t2: q.join.table.columns,
-    })->getProjection,
+    projection: {
+      t1: Obj.magic(q.from.columns),
+      t2: Obj.magic(q.join.table.columns),
+    }->getProjection,
+  })
+
+  let toSubquery = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p): 'p => Node.makeSubquery({
+    from: {name: q.from.name, alias: q.from.alias},
+    joins: [
+      {
+        table: {
+          name: q.join.table.name,
+          alias: q.join.table.alias,
+        },
+        joinType: q.join.joinType,
+        on: q.join.on,
+      },
+    ],
+    where: q.where,
+    projection: {
+      value: {
+        t1: Obj.magic(q.from.columns),
+        t2: Obj.magic(q.join.table.columns),
+      }->getProjection,
+    },
   })
 }
 
@@ -114,14 +135,14 @@ module S1 = {
     projection: q.from.columns->getProjection,
   })
 
-  let selectSingle = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p => Node.Subquery({
+  let toSubquery = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p => Node.makeSubquery({
     from: {name: q.from.name, alias: q.from.alias},
     joins: [],
     where: q.where,
     projection: {
       value: q.from.columns->getProjection
     },
-  })->Obj.magic
+  })
 }
 
 let from = (t1: Table.t<'full, 'partial, 'optional>): S1.t<'full, 'full> => {

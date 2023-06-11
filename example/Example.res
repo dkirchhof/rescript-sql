@@ -110,12 +110,7 @@ from(ArtistsTable.table)
 ->log
 
 from(ArtistsTable.table)
-->S1.where(c =>
-  eq(
-    c.id,
-    from(ArtistsTable.table)->S1.selectSingle(c => c.id),
-  )
-)
+->S1.where(c => eq(c.id, from(ArtistsTable.table)->S1.toSubquery(c => c.id)))
 ->S1.select(c =>
   {
     "id": c.id,
@@ -123,4 +118,3 @@ from(ArtistsTable.table)
   }
 )
 ->log
-
