@@ -86,7 +86,7 @@ module S1 = {
     t2: 's2,
   }
 
-  let innerJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<'p1, 's1, 'full, 'full> => {
+  let _join = (q, t2: Table.t<_>, getOn, joinType) => {
     let from = {
       name: q.from.name,
       alias: Some("t1"),
@@ -100,10 +100,10 @@ module S1 = {
     }
 
     {
-      from,
+      S2.from,
       join: {
         table: joinedTable,
-        joinType: INNER,
+        joinType,
         on: getOn({
           t1: from.columns,
           t2: joinedTable.columns,
@@ -113,32 +113,11 @@ module S1 = {
     }
   }
 
-  let leftJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<'p1, 's1, 'optional, 'full> => {
-    let from = {
-      name: q.from.name,
-      alias: Some("t1"),
-      columns: Utils.mapColumns(q.from.columns, column => {...column, tableAlias: "t1"}),
-    }
+  let innerJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<'p1, 's1, 'full, 'full> => 
+    _join(q, t2, getOn, INNER)
 
-    let joinedTable = {
-      name: t2.name,
-      alias: Some("t2"),
-      columns: Utils.mapColumns(t2.columns, column => {...column, tableAlias: "t2"}),
-    }
-
-    {
-      from,
-      join: {
-        table: joinedTable,
-        joinType: LEFT,
-        on: getOn({
-          t1: from.columns,
-          t2: joinedTable.columns,
-        })
-      },
-      where: q.where,
-    }
-  }
+  let leftJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<'p1, 's1, 'optional, 'full> =>
+    _join(q, t2, getOn, LEFT)
 
   let where = (q, getWhere) => {
     ...q,
