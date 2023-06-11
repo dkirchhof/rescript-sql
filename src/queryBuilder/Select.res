@@ -1,4 +1,3 @@
-type joinType = INNER | LEFT
 type direction = ASC | DESC
 
 type source<'projectable, 'selectable> = {
@@ -9,28 +8,8 @@ type source<'projectable, 'selectable> = {
 
 type join<'projectable, 'selectable> = {
   table: source<'projectable, 'selectable>,
-  joinType: joinType,
+  joinType: JoinType.t,
   on: Expr.t,
-}
-
-module Executable = {
-  type source = {
-    name: string,
-    alias: option<string>,
-  }
-
-  type join = {
-    table: source,
-    joinType: joinType,
-    on: Expr.t,
-  }
-
-  type t<'projection> = {
-    from: source,
-    joins: array<join>,
-    where: option<Expr.t>,
-    projection: 'projection,
-  }
 }
 
 module S2 = {
@@ -55,8 +34,8 @@ module S2 = {
     ),
   }
 
-  let select = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p): Executable.t<'p> => {
-    Executable.from: {name: q.from.name, alias: q.from.alias},
+  let select = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p) => Query.Select({
+    from: {name: q.from.name, alias: q.from.alias},
     joins: [
       {
         table: {
@@ -72,7 +51,7 @@ module S2 = {
       t1: q.from.columns,
       t2: q.join.table.columns,
     })->getProjection,
-  }
+  })
 }
 
 module S1 = {
@@ -124,12 +103,12 @@ module S1 = {
     where: Some(getWhere(q.from.columns)),
   }
 
-  let select = (q: t<'p1, _>, getProjection: 'p1 => 'p): Executable.t<'p> => {
-    Executable.from: {name: q.from.name, alias: q.from.alias},
+  let select = (q: t<'p1, _>, getProjection: 'p1 => 'p) => Query.Select({
+    from: {name: q.from.name, alias: q.from.alias},
     joins: [],
     where: q.where,
     projection: q.from.columns->getProjection,
-  }
+  })
 }
 
 let from = (t1: Table.t<'full, 'partial, 'optional>): S1.t<'full, 'full> => {
