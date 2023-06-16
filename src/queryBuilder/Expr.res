@@ -1,9 +1,7 @@
-type node
-
 type rec t =
   // | And(array<t>)
   // | Or(array<t>)
-  | EQUAL(node, node)
+  | EQUAL(Unknown.t, Unknown.t)
 // | NotEqual(Schema.Column.unknownColumn, Node.unknownNode)
 // | GreaterThan(Schema.Column.unknownColumn, Node.unknownNode)
 // | GreaterThanEqual(Schema.Column.unknownColumn, Node.unknownNode)
@@ -14,4 +12,4 @@ type rec t =
 // | In(Schema.Column.unknownColumn, array<Node.unknownNode>)
 // | NotIn(Schema.Column.unknownColumn, array<Node.unknownNode>)
 
-let eq = (left: 't, right: 't) => EQUAL(Obj.magic(left), Obj.magic(right))
+let eq = (left: 't, right: 't) => EQUAL(Unknown.make(left), Unknown.make(right))

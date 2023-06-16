@@ -132,7 +132,7 @@ module S1 = {
     from: {name: q.from.name, alias: q.from.alias},
     joins: [],
     where: q.where,
-    projection: q.from.columns->getProjection,
+    projection: q.from.columns->getProjection->Utils.ensureNodes,
   })
 
   let selectAll = (q: t<'p1, _>) => Query.Select({

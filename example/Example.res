@@ -77,16 +77,16 @@ let log: 'a => unit = %raw(`
 open Select
 open Expr
 
-from(ArtistsTable.table)->S1.where(c => eq(c.id, 1))->S1.selectAll->log
+from(ArtistsTable.table)->S1.where(c => eq(c.id, 1))->S1.selectAll->SQL.toSQL->log
 
 from(ArtistsTable.table)
-->S1.where(c => eq(c.id, 1))
-->S1.select(c =>
-  {
-    "id": c.id,
-    "name": c.name,
-  }
-)
+->S1.select(c => {"name": c.name})
+->SQL.toSQL
+->log
+
+from(ArtistsTable.table)
+->S1.select(c => {"name": c.name, "someNumber": 1, "someString": "hello world"})
+->SQL.toSQL
 ->log
 
 from(ArtistsTable.table)
@@ -98,6 +98,7 @@ from(ArtistsTable.table)
     "name": c.t2.name,
   }
 )
+->SQL.toSQL
 ->log
 
 from(ArtistsTable.table)
@@ -109,6 +110,7 @@ from(ArtistsTable.table)
     "name": c.t2.name,
   }
 )
+->SQL.toSQL
 ->log
 
 from(ArtistsTable.table)
@@ -119,4 +121,5 @@ from(ArtistsTable.table)
     "name": c.name,
   }
 )
+->SQL.toSQL
 ->log
