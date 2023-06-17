@@ -47,6 +47,14 @@ let whereToSQL = where => {
   where->Option.map(expr => `WHERE ${SQL_Expr.toSQL(expr)}`)
 }
 
+let limitToSQL = limit => {
+  limit->Option.map(l => `LIMIT ${Int.toString(l)}`)
+}
+
+let offsetToSQL = offset => {
+  offset->Option.map(o => `OFFSET ${Int.toString(o)}`)
+}
+
 let toSQL = q => {
   open StringBuilder
 
@@ -58,7 +66,7 @@ let toSQL = q => {
   // ->addSO(0, groupByToSQL(q.groupBy))
   // ->addSO(0, havingToSQL(q.having))
   // ->addSO(0, orderByToSQL(q.orderBy))
-  // ->addSO(0, limitToSQL(q.limit))
-  // ->addSO(0, offsetToSQL(q.offset))
+  ->addSO(0, limitToSQL(q.limit))
+  ->addSO(0, offsetToSQL(q.offset))
   ->build("\n")
 }

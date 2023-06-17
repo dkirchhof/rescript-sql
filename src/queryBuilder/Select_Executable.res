@@ -13,5 +13,7 @@ type t<'projection> = {
   from: source,
   joins: array<join>,
   where: option<Expr.t>,
+  limit: option<int>,
+  offset: option<int>,
   projection: 'projection,
 }

@@ -77,12 +77,15 @@ let log: 'a => unit = %raw(`
 open Select
 open Expr
 
-from(ArtistsTable.table)->S1.where(c => eq(c.id, 1))->S1.selectAll->SQL.toSQL->log
-
 from(ArtistsTable.table)
-->S1.select(c => {"name": c.name})
+->S1.where(c => eq(c.id, 1))
+// ->S1.limit(1)
+// ->S1.offset(1)
+->S1.selectAll
 ->SQL.toSQL
 ->log
+
+from(ArtistsTable.table)->S1.select(c => {"name": c.name})->SQL.toSQL->log
 
 from(ArtistsTable.table)
 ->S1.select(c => {"name": c.name, "someNumber": 1, "someString": "hello world"})

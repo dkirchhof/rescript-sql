@@ -12,9 +12,7 @@ type join<'projectable, 'selectable> = {
   on: Expr.t,
 }
 
-type singleColumnProjection<'a> = {
-  value: 'a,
-}
+type singleColumnProjection<'a> = {value: 'a}
 
 module S2 = {
   type columns<'s1, 's2> = {
@@ -26,6 +24,8 @@ module S2 = {
     from: source<'p1, 's1>,
     join: join<'p2, 's2>,
     where: option<Expr.t>,
+    limit: option<int>,
+    offset: option<int>,
   }
 
   let where = (q, getWhere) => {
@@ -51,38 +51,45 @@ module S2 = {
       },
     ],
     where: q.where,
+    limit: q.limit,
+    offset: q.offset,
     projection: {
       t1: Obj.magic(q.from.columns),
       t2: Obj.magic(q.join.table.columns),
     }->getProjection,
   })
 
-  let toSubquery = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p): 'p => Node.makeSubquery({
-    from: {name: q.from.name, alias: q.from.alias},
-    joins: [
-      {
-        table: {
-          name: q.join.table.name,
-          alias: q.join.table.alias,
+  let toSubquery = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p): 'p =>
+    Node.makeSubquery({
+      from: {name: q.from.name, alias: q.from.alias},
+      joins: [
+        {
+          table: {
+            name: q.join.table.name,
+            alias: q.join.table.alias,
+          },
+          joinType: q.join.joinType,
+          on: q.join.on,
         },
-        joinType: q.join.joinType,
-        on: q.join.on,
+      ],
+      where: q.where,
+      limit: q.limit,
+      offset: q.offset,
+      projection: {
+        value: {
+          t1: Obj.magic(q.from.columns),
+          t2: Obj.magic(q.join.table.columns),
+        }->getProjection,
       },
-    ],
-    where: q.where,
-    projection: {
-      value: {
-        t1: Obj.magic(q.from.columns),
-        t2: Obj.magic(q.join.table.columns),
-      }->getProjection,
-    },
-  })
+    })
 }
 
 module S1 = {
   type t<'p1, 's1> = {
     from: source<'p1, 's1>,
     where: option<Expr.t>,
+    limit: option<int>,
+    offset: option<int>,
   }
 
   type joinedColumns<'s1, 's2> = {
@@ -111,27 +118,39 @@ module S1 = {
         on: getOn({
           t1: from.columns,
           t2: joinedTable.columns,
-        })
+        }),
       },
       where: q.where,
+      limit: q.limit,
+      offset: q.offset,
     }
   }
 
-  let innerJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<'p1, 's1, 'full, 'full> => 
-    _join(q, t2, getOn, INNER)
+  let innerJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<
+    'p1,
+    's1,
+    'full,
+    'full,
+  > => _join(q, t2, getOn, INNER)
 
-  let leftJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<'p1, 's1, 'optional, 'full> =>
-    _join(q, t2, getOn, LEFT)
+  let leftJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<
+    'p1,
+    's1,
+    'optional,
+    'full,
+  > => _join(q, t2, getOn, LEFT)
 
   let where = (q, getWhere) => {
     ...q,
     where: Some(getWhere(q.from.columns)),
   }
 
-  let select = (q: t<'p1, _>, getProjection: 'p1 => {..} as 'p) => Query.Select({
+  let select = (q: t<'p1, _>, getProjection: ('p1 => {..}) as 'p) => Query.Select({
     from: {name: q.from.name, alias: q.from.alias},
     joins: [],
     where: q.where,
+    limit: q.limit,
+    offset: q.offset,
     projection: q.from.columns->getProjection->Utils.ensureNodes,
   })
 
@@ -139,20 +158,27 @@ module S1 = {
     from: {name: q.from.name, alias: q.from.alias},
     joins: [],
     where: q.where,
+    limit: q.limit,
+    offset: q.offset,
     projection: q.from.columns,
   })
 
-  let toSubquery = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p => Node.makeSubquery({
-    from: {name: q.from.name, alias: q.from.alias},
-    joins: [],
-    where: q.where,
-    projection: {
-      value: q.from.columns->getProjection
-    },
-  })
+  let toSubquery = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p =>
+    Node.makeSubquery({
+      from: {name: q.from.name, alias: q.from.alias},
+      joins: [],
+      where: q.where,
+      limit: q.limit,
+      offset: q.offset,
+      projection: {
+        value: q.from.columns->getProjection,
+      },
+    })
 }
 
 let from = (t1: Table.t<'full, 'partial, 'optional>): S1.t<'full, 'full> => {
   S1.from: {name: t1.name, alias: None, columns: t1.columns},
   where: None,
+  limit: None,
+  offset: None,
 }
