@@ -71,14 +71,14 @@ let from = (table: Table.t<_>) => {
   orderBy: [],
   limit: None,
   offset: None,
-  _projectables: table.columns,
-  _selectables: table.columns,
+  _projectables: table.select,
+  _selectables: table.select,
 }
 
 let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
   let _selectables = {
     t1: Utils.getColumnsWithTableAlias(q._selectables, "t1"),
-    t2: Utils.getColumnsWithTableAlias(table.columns, "t2"),
+    t2: Utils.getColumnsWithTableAlias(table.select, "t2"),
   }
 
   {
@@ -110,7 +110,7 @@ let innerJoin1 = (q, table, getOn) =>
     INNER,
     {
       t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Utils.getColumnsWithTableAlias(table.columns, "t2"),
+      t2: Utils.getColumnsWithTableAlias(table.select, "t2"),
     },
   )
 
@@ -122,7 +122,7 @@ let leftJoin1 = (q, table, getOn) =>
     LEFT,
     {
       t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Some(Utils.getColumnsWithTableAlias(table.columns, "t2")),
+      t2: Some(Utils.getColumnsWithTableAlias(table.select, "t2")),
     },
   )
 
@@ -133,7 +133,7 @@ let where = (q, getWhere) => {
 
 let groupBy = (q, getGroupBy) => {
   ...q,
-  groupBy: getGroupBy(q._selectables),
+  groupBy: getGroupBy(q._selectables)
 }
 
 let having = (q, getHaving) => {
@@ -143,7 +143,7 @@ let having = (q, getHaving) => {
 
 let orderBy = (q, getOrderBy) => {
   ...q,
-  orderBy: getOrderBy(q._selectables),
+  orderBy: getOrderBy(q._selectables)
 }
 
 let limit = (q, limit) => {
@@ -156,26 +156,27 @@ let offset = (q, offset) => {
   offset: Some(offset),
 }
 
-let selectAll = q => {
-  Select_Executable.from: q.from,
-  joins: q.joins,
-  where: q.where,
-  groupBy: q.groupBy,
-  having: q.having,
-  orderBy: q.orderBy,
-  limit: q.limit,
-  offset: q.offset,
-  projection: q._projectables->Utils.ensureNodes,
-}
+let selectAll = q =>
+  Query.Select({
+    from: q.from,
+    joins: q.joins,
+    where: q.where,
+    groupBy: q.groupBy,
+    having: q.having,
+    orderBy: q.orderBy,
+    limit: q.limit,
+    offset: q.offset,
+    projection: q._projectables->Utils.ensureNodes,
+  })
 
-let select = (q, getProjection) => {
-  Select_Executable.from: q.from,
-  joins: q.joins,
-  where: q.where,
-  groupBy: q.groupBy,
-  having: q.having,
-  orderBy: q.orderBy,
-  limit: q.limit,
-  offset: q.offset,
-  projection: q._projectables->getProjection->Utils.ensureNodes,
-}
+let select = (q, getProjection) => Query.Select({
+    from: q.from,
+    joins: q.joins,
+    where: q.where,
+    groupBy: q.groupBy,
+    having: q.having,
+    orderBy: q.orderBy,
+    limit: q.limit,
+    offset: q.offset,
+    projection: q._projectables->getProjection->Utils.ensureNodes,
+})
