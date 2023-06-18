@@ -42,7 +42,8 @@ type t<'a, 'b> = {
   from: Source.t,
   joins: array<Join.t>,
   where: option<Expr.t>,
-  orderBys: array<OrderBy.t>,
+  groupBy: array<GroupBy.t>,
+  orderBy: array<OrderBy.t>,
   limit: option<int>,
   offset: option<int>,
   _projectables: 'a,
@@ -66,7 +67,8 @@ let from = (table: Table.t<_>) => {
   from: {name: table.name, alias: None},
   joins: [],
   where: None,
-  orderBys: [],
+  groupBy: [],
+  orderBy: [],
   limit: None,
   offset: None,
   _projectables: table.full,
@@ -129,9 +131,14 @@ let where = (q, getWhere) => {
   where: q._selectables->getWhere->Some,
 }
 
-let orderBy = (q, getOrderBys) => {
+let groupBy = (q, getGroupBy) => {
   ...q,
-  orderBys: getOrderBys(q._selectables)
+  groupBy: getGroupBy(q._selectables)
+}
+
+let orderBy = (q, getOrderBy) => {
+  ...q,
+  orderBy: getOrderBy(q._selectables)
 }
 
 let limit = (q, limit) => {
@@ -149,7 +156,8 @@ let selectAll = q =>
     from: q.from,
     joins: q.joins,
     where: q.where,
-    orderBys: q.orderBys,
+    groupBy: q.groupBy,
+    orderBy: q.orderBy,
     limit: q.limit,
     offset: q.offset,
     projection: q._projectables->Utils.ensureNodes,
@@ -159,7 +167,8 @@ let select = (q, getProjection) => Query.Select({
     from: q.from,
     joins: q.joins,
     where: q.where,
-    orderBys: q.orderBys,
+    groupBy: q.groupBy,
+    orderBy: q.orderBy,
     limit: q.limit,
     offset: q.offset,
     projection: q._projectables->getProjection->Utils.ensureNodes,

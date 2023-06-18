@@ -60,6 +60,7 @@ module SongsTable = {
 open Select
 open Expr
 open OrderBy
+open GroupBy
 
 from(ArtistsTable.table)->selectAll->SQL.toSQL->Utils.log
 
@@ -107,7 +108,8 @@ from(ArtistsTable.table)
 
 from(ArtistsTable.table)
 ->where(c => eq(c.id, 1))
-->orderBy(c => [asc(c.name)])
+->groupBy(c => [group(c.id), group(c.name)])
+->orderBy(c => [asc(c.id), desc(c.name)])
 ->limit(1)
 ->offset(1)
 ->selectAll
@@ -117,7 +119,8 @@ from(ArtistsTable.table)
 from(ArtistsTable.table)
 ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->where(c => eq(c.t1.id, 1))
-->orderBy(c => [asc(c.t1.name)])
+->groupBy(c => [group(c.t1.id), group(c.t2.name)])
+->orderBy(c => [asc(c.t1.id), desc(c.t2.name)])
 ->limit(1)
 ->offset(1)
 ->selectAll
