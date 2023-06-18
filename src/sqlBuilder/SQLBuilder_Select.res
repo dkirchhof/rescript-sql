@@ -14,7 +14,7 @@ let projectionToSQL = projection => {
       switch node {
       | ProjectionGroup(group) => getFields(group, Array.concat(path, [alias]))
       | _ => {
-          let nodeAsSQL = SQL_Node.toSQL(node)
+          let nodeAsSQL = SQLBuilder_Node.toSQL(node)
 
           if nodeAsSQL === alias {
             [nodeAsSQL]
@@ -50,20 +50,20 @@ let joinsToSQL = (joins: array<Join.t>) => {
     ->addS(0, join.table.name)
     ->addSO(0, join.table.alias->Option.map(alias => `AS ${alias}`))
     ->addS(0, "ON")
-    ->addS(0, SQL_Expr.toSQL(join.on))
+    ->addS(0, SQLBuilder_Expr.toSQL(join.on))
     ->build(" ")
   })
 }
 
 let whereToSQL = where => {
-  where->Option.map(expr => `WHERE ${SQL_Expr.toSQL(expr)}`)
+  where->Option.map(expr => `WHERE ${SQLBuilder_Expr.toSQL(expr)}`)
 }
 
 let groupByToSQL = (groupBys: array<GroupBy.t>) => {
   switch groupBys {
   | [] => None
   | _ => {
-      let parts = groupBys->Array.map(SQL_Unknown.toSQL)->Array.joinWith(", ")
+      let parts = groupBys->Array.map(SQLBuilder_Unknown.toSQL)->Array.joinWith(", ")
 
       Some(`GROUP BY ${parts}`)
     }
@@ -71,7 +71,7 @@ let groupByToSQL = (groupBys: array<GroupBy.t>) => {
 }
 
 let havingToSQL = having => {
-  having->Option.map(expr => `HAVING ${SQL_Expr.toSQL(expr)}`)
+  having->Option.map(expr => `HAVING ${SQLBuilder_Expr.toSQL(expr)}`)
 }
 
 external directionToString: OrderBy.direction => string = "%identity"
@@ -83,7 +83,7 @@ let orderByToSQL = (orderBys: array<OrderBy.t>) => {
       let parts =
         orderBys
         ->Array.map(orderBy => {
-          let node = SQL_Unknown.toSQL(orderBy.node)
+          let node = SQLBuilder_Unknown.toSQL(orderBy.node)
           let direction = directionToString(orderBy.direction)
 
           `${node} ${direction}`

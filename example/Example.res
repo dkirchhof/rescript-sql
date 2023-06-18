@@ -58,9 +58,10 @@ module SongsTable = {
 /* end of generated code */
 
 open CreateTable
+open SQLBuilder.CreateTable
 
-createTable(ArtistsTable.table)->SQL_CreateTable.toSQL->Utils.log
-createTable(SongsTable.table)->SQL_CreateTable.toSQL->Utils.log
+createTable(ArtistsTable.table)->toSQL->Utils.log
+createTable(SongsTable.table)->toSQL->Utils.log
 
 // open Select
 // open Expr
