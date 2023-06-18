@@ -62,8 +62,6 @@ type columns2<'a, 'b> = {
   t2: 'b,
 }
 
-type columns1<'a> = 'a
-
 let from = (table: Table.t<_>) => {
   from: {name: table.name, alias: None},
   joins: [],
@@ -73,14 +71,14 @@ let from = (table: Table.t<_>) => {
   orderBy: [],
   limit: None,
   offset: None,
-  _projectables: table.full,
-  _selectables: table.full,
+  _projectables: table.select,
+  _selectables: table.select,
 }
 
 let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
   let _selectables = {
     t1: Utils.getColumnsWithTableAlias(q._selectables, "t1"),
-    t2: Utils.getColumnsWithTableAlias(table.full, "t2"),
+    t2: Utils.getColumnsWithTableAlias(table.select, "t2"),
   }
 
   {
@@ -112,7 +110,7 @@ let innerJoin1 = (q, table, getOn) =>
     INNER,
     {
       t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Utils.getColumnsWithTableAlias(table.full, "t2"),
+      t2: Utils.getColumnsWithTableAlias(table.select, "t2"),
     },
   )
 
@@ -124,7 +122,7 @@ let leftJoin1 = (q, table, getOn) =>
     LEFT,
     {
       t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Some(Utils.getColumnsWithTableAlias(table.full, "t2")),
+      t2: Some(Utils.getColumnsWithTableAlias(table.select, "t2")),
     },
   )
 

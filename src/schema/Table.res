@@ -1,8 +1,8 @@
-type t<'full, 'partial, 'optional> = {
+type t<'select, 'insert, 'update> = {
   name: string,
-  full: 'full,
-  partial: 'partial,
-  optional: 'optional,
+  select: 'select,
+  insert: 'insert,
+  update: 'update,
 }
 
 let make = (name, columns: array<Column.t>) => {
@@ -13,8 +13,8 @@ let make = (name, columns: array<Column.t>) => {
 
   {
     name,
-    full: Obj.magic(columns),
-    partial: Obj.magic(columns),
-    optional: Obj.magic(columns),
+    select: Obj.magic(columns),
+    insert: Obj.magic(columns),
+    update: Obj.magic(columns),
   }
 }

@@ -1,22 +1,22 @@
 /* start of generated code */
 
 module ArtistsTable = {
-  type full = {
+  type select = {
     id: int,
     name: string,
   }
 
-  type partial = {
+  type insert = {
     id?: int,
     name: string,
   }
 
-  type optional = {
+  type update = {
     id?: int,
     name?: string,
   }
 
-  type t = Table.t<full, partial, optional>
+  type t = Table.t<select, insert, update>
 
   let table: t = Table.make(
     "artists",
@@ -25,25 +25,25 @@ module ArtistsTable = {
 }
 
 module SongsTable = {
-  type full = {
+  type select = {
     id: int,
     artistId: int,
     name: string,
   }
 
-  type partial = {
+  type insert = {
     id?: int,
     artistId: int,
     name: string,
   }
 
-  type optional = {
+  type update = {
     id?: int,
     artistId?: int,
     name?: string,
   }
 
-  type t = Table.t<full, partial, optional>
+  type t = Table.t<select, insert, update>
 
   let table: t = Table.make(
     "songs",
@@ -56,6 +56,11 @@ module SongsTable = {
 }
 
 /* end of generated code */
+
+open CreateTable
+createTable(ArtistsTable.table)->Utils.log
+
+
 
 open Select
 open Expr
