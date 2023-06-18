@@ -57,8 +57,8 @@ module SongsTable = {
 
 /* end of generated code */
 
-open CreateTable
-createTable(ArtistsTable.table)->Utils.log
+// open CreateTable
+// createTable(ArtistsTable.table)->Utils.log
 
 
 
@@ -67,48 +67,48 @@ open Expr
 open OrderBy
 open GroupBy
 
-from(ArtistsTable.table)->selectAll->SQL.toSQL->Utils.log
+from(ArtistsTable.table)->selectAll->SQL_Select.toSQL->Utils.log
 
 from(ArtistsTable.table)
 ->where(c => eq(c.id, 1))
 ->select(c => {"name": c.name, "someNumber": 1, "someString": "hello world", "someBoolean": true})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
 ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
 ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
 ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
 ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
 ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artistName": c.t1.name, "songName": Option.map(c.t2, t2 => t2.name)})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
 ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
@@ -119,7 +119,7 @@ from(ArtistsTable.table)
 ->limit(1)
 ->offset(1)
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 from(ArtistsTable.table)
@@ -131,7 +131,7 @@ from(ArtistsTable.table)
 ->limit(1)
 ->offset(1)
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
 // from(ArtistsTable.table)
@@ -142,5 +142,4 @@ from(ArtistsTable.table)
 //     "name": c.name,
 //   }
 // )
-// ->SQL.toSQL
 // ->log
