@@ -1,51 +1,41 @@
 /* start of generated code */
 
 module ArtistsTable = {
-  type select = {
-    id: int,
-    name: string,
-  }
-
-  type insert = {
-    id?: int,
-    name: string,
-  }
-
-  type update = {
-    id?: int,
-    name?: string,
-  }
-
-  type t = Table.t<select, insert, update>
-
-  let table: t = Table.make(
+  let _table = Table.make(
     "artists",
     [{name: "id", type_: "INTEGER"}, {name: "name", type_: "TEXT"}],
   )
+
+  module Select = {
+    type t = {
+      id: int,
+      name: string,
+    }
+
+    let table: Table.t<t> = _table
+  }
+
+  module Insert = {
+    type t = {
+      id?: int,
+      name: string,
+    }
+
+    let table: Table.t<t> = _table
+  }
+
+  module Update = {
+    type t = {
+      id?: int,
+      name?: string,
+    }
+
+    let table: Table.t<t> = _table
+  }
 }
 
 module SongsTable = {
-  type select = {
-    id: int,
-    artistId: int,
-    name: string,
-  }
-
-  type insert = {
-    id?: int,
-    artistId: int,
-    name: string,
-  }
-
-  type update = {
-    id?: int,
-    artistId?: int,
-    name?: string,
-  }
-
-  type t = Table.t<select, insert, update>
-
-  let table: t = Table.make(
+  let _table = Table.make(
     "songs",
     [
       {name: "id", type_: "INTEGER"},
@@ -53,65 +43,94 @@ module SongsTable = {
       {name: "name", type_: "TEXT"},
     ],
   )
+
+  module Select = {
+    type t = {
+      id: int,
+      artistId: int,
+      name: string,
+    }
+
+    let table: Table.t<t> = _table
+  }
+
+  module Insert = {
+    type t = {
+      id?: int,
+      artistId: int,
+      name: string,
+    }
+
+    let table: Table.t<t> = _table
+  }
+
+  module Update = {
+    type t = {
+      id?: int,
+      artistId?: int,
+      name?: string,
+    }
+
+    let table: Table.t<t> = _table
+  }
 }
 
 /* end of generated code */
 
-open CreateTable
-createTable(ArtistsTable.table)->Utils.log
+// open CreateTable
 
-
+// createTable(ArtistsTable.Select.table)->SQL_CreateTable.toSQL->Utils.log
 
 open Select
 open Expr
 open OrderBy
 open GroupBy
 
-from(ArtistsTable.table)->selectAll->SQL.toSQL->Utils.log
+from(ArtistsTable.Select.table)->selectAll->SQL_Select.toSQL->Utils.log
 
-from(ArtistsTable.table)
+from(ArtistsTable.Select.table)
 ->where(c => eq(c.id, 1))
 ->select(c => {"name": c.name, "someNumber": 1, "someString": "hello world", "someBoolean": true})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
-->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+from(ArtistsTable.Select.table)
+->innerJoin1(SongsTable.Select.table, c => eq(c.t2.artistId, c.t1.id))
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
-->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+from(ArtistsTable.Select.table)
+->innerJoin1(SongsTable.Select.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
-->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+from(ArtistsTable.Select.table)
+->innerJoin1(SongsTable.Select.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
-->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+from(ArtistsTable.Select.table)
+->leftJoin1(SongsTable.Select.table, c => eq(c.t2.artistId, c.t1.id))
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
-->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+from(ArtistsTable.Select.table)
+->leftJoin1(SongsTable.Select.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artistName": c.t1.name, "songName": Option.map(c.t2, t2 => t2.name)})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
-->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+from(ArtistsTable.Select.table)
+->leftJoin1(SongsTable.Select.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
+from(ArtistsTable.Select.table)
 ->where(c => eq(c.id, 1))
 ->groupBy(c => [group(c.id), group(c.name)])
 ->having(c => eq(c.id, 1))
@@ -119,11 +138,11 @@ from(ArtistsTable.table)
 ->limit(1)
 ->offset(1)
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-from(ArtistsTable.table)
-->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+from(ArtistsTable.Select.table)
+->innerJoin1(SongsTable.Select.table, c => eq(c.t2.artistId, c.t1.id))
 ->where(c => eq(c.t1.id, 1))
 ->groupBy(c => [group(c.t1.id), group(c.t2.name)])
 ->having(c => eq(c.t1.id, 1))
@@ -131,16 +150,16 @@ from(ArtistsTable.table)
 ->limit(1)
 ->offset(1)
 ->selectAll
-->SQL.toSQL
+->SQL_Select.toSQL
 ->Utils.log
 
-// from(ArtistsTable.table)
-// ->S1.where(c => eq(c.id, from(ArtistsTable.table)->S1.toSubquery(c => c.id)))
+// from(ArtistsTable.Select.table)
+// ->S1.where(c => eq(c.id, from(ArtistsTable.Select.table)->S1.toSubquery(c => c.id)))
 // ->S1.select(c =>
 //   {
 //     "id": c.id,
 //     "name": c.name,
 //   }
 // )
-// ->SQL.toSQL
+// ->SQL_Select.toSQL
 // ->log
