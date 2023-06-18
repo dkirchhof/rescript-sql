@@ -1,17 +1,6 @@
-type source = {
-  name: string,
-  alias: option<string>,
-}
-
-type join = {
-  table: source,
-  joinType: JoinType.t,
-  on: Expr.t,
-}
-
 type t<'projection> = {
-  from: source,
-  joins: array<join>,
+  from: Source.t,
+  joins: array<Join.t>,
   where: option<Expr.t>,
   limit: option<int>,
   offset: option<int>,

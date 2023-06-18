@@ -1,184 +1,196 @@
-type direction = ASC | DESC
+// type singleColumnProjection<'a> = {value: 'a}
 
-type source<'projectable, 'selectable> = {
-  name: string,
-  alias: option<string>,
-  columns: 'selectable,
+//   let select = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p) => Query.Select({
+//     from: {name: q.from.name, alias: q.from.alias},
+//     joins: [
+//       {
+//         table: {
+//           name: q.join.table.name,
+//           alias: q.join.table.alias,
+//         },
+//         joinType: q.join.joinType,
+//         on: q.join.on,
+//       },
+//     ],
+//     where: q.where,
+//     limit: q.limit,
+//     offset: q.offset,
+//     projection: {
+//       t1: Obj.magic(q.from.columns),
+//       t2: Obj.magic(q.join.table.columns),
+//     }->getProjection,
+//   })
+
+//   let toSubquery = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p): 'p =>
+//     Node.makeSubquery({
+//       from: {name: q.from.name, alias: q.from.alias},
+//       joins: [
+//         {
+//           table: {
+//             name: q.join.table.name,
+//             alias: q.join.table.alias,
+//           },
+//           joinType: q.join.joinType,
+//           on: q.join.on,
+//         },
+//       ],
+//       where: q.where,
+//       limit: q.limit,
+//       offset: q.offset,
+//       projection: {
+//         value: {
+//           t1: Obj.magic(q.from.columns),
+//           t2: Obj.magic(q.join.table.columns),
+//         }->getProjection,
+//       },
+//     })
+// }
+
+//   let select = (q: t<'p1, _>, getProjection: ('p1 => {..}) as 'p) => Query.Select({
+//     from: {name: q.from.name, alias: q.from.alias},
+//     joins: [],
+//     where: q.where,
+//     limit: q.limit,
+//     offset: q.offset,
+//     projection: q.from.columns->getProjection->Utils.ensureNodes,
+//   })
+
+//   let selectAll = (q: t<'p1, _>) => Query.Select({
+//     from: {name: q.from.name, alias: q.from.alias},
+//     joins: [],
+//     where: q.where,
+//     limit: q.limit,
+//     offset: q.offset,
+//     projection: q.from.columns,
+//   })
+
+//   let toSubquery = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p =>
+//     Node.makeSubquery({
+//       from: {name: q.from.name, alias: q.from.alias},
+//       joins: [],
+//       where: q.where,
+//       limit: q.limit,
+//       offset: q.offset,
+//       projection: {
+//         value: q.from.columns->getProjection,
+//       },
+//     })
+// }
+
+type t<'a, 'b> = {
+  from: Source.t,
+  joins: array<Join.t>,
+  where: option<Expr.t>,
+  limit: option<int>,
+  offset: option<int>,
+  _projectables: 'a,
+  _selectables: 'b,
 }
 
-type join<'projectable, 'selectable> = {
-  table: source<'projectable, 'selectable>,
-  joinType: JoinType.t,
-  on: Expr.t,
+type columns3<'a, 'b, 'c> = {
+  t1: 'a,
+  t2: 'b,
+  t3: 'c,
 }
 
-type singleColumnProjection<'a> = {value: 'a}
-
-module S2 = {
-  type columns<'s1, 's2> = {
-    t1: 's1,
-    t2: 's2,
-  }
-
-  type t<'p1, 's1, 'p2, 's2> = {
-    from: source<'p1, 's1>,
-    join: join<'p2, 's2>,
-    where: option<Expr.t>,
-    limit: option<int>,
-    offset: option<int>,
-  }
-
-  let where = (q, getWhere) => {
-    ...q,
-    where: Some(
-      getWhere({
-        t1: q.from.columns,
-        t2: q.join.table.columns,
-      }),
-    ),
-  }
-
-  let select = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p) => Query.Select({
-    from: {name: q.from.name, alias: q.from.alias},
-    joins: [
-      {
-        table: {
-          name: q.join.table.name,
-          alias: q.join.table.alias,
-        },
-        joinType: q.join.joinType,
-        on: q.join.on,
-      },
-    ],
-    where: q.where,
-    limit: q.limit,
-    offset: q.offset,
-    projection: {
-      t1: Obj.magic(q.from.columns),
-      t2: Obj.magic(q.join.table.columns),
-    }->getProjection,
-  })
-
-  let toSubquery = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p): 'p =>
-    Node.makeSubquery({
-      from: {name: q.from.name, alias: q.from.alias},
-      joins: [
-        {
-          table: {
-            name: q.join.table.name,
-            alias: q.join.table.alias,
-          },
-          joinType: q.join.joinType,
-          on: q.join.on,
-        },
-      ],
-      where: q.where,
-      limit: q.limit,
-      offset: q.offset,
-      projection: {
-        value: {
-          t1: Obj.magic(q.from.columns),
-          t2: Obj.magic(q.join.table.columns),
-        }->getProjection,
-      },
-    })
+type columns2<'a, 'b> = {
+  t1: 'a,
+  t2: 'b,
 }
 
-module S1 = {
-  type t<'p1, 's1> = {
-    from: source<'p1, 's1>,
-    where: option<Expr.t>,
-    limit: option<int>,
-    offset: option<int>,
-  }
+type columns1<'a> = 'a
 
-  type joinedColumns<'s1, 's2> = {
-    t1: 's1,
-    t2: 's2,
-  }
-
-  let _join = (q, t2: Table.t<_>, getOn, joinType) => {
-    let from = {
-      name: q.from.name,
-      alias: Some("t1"),
-      columns: Utils.getColumnsWithTableAlias(q.from.columns, "t1"),
-    }
-
-    let joinedTable = {
-      name: t2.name,
-      alias: Some("t2"),
-      columns: Utils.getColumnsWithTableAlias(t2.columns, "t2"),
-    }
-
-    {
-      S2.from,
-      join: {
-        table: joinedTable,
-        joinType,
-        on: getOn({
-          t1: from.columns,
-          t2: joinedTable.columns,
-        }),
-      },
-      where: q.where,
-      limit: q.limit,
-      offset: q.offset,
-    }
-  }
-
-  let innerJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<
-    'p1,
-    's1,
-    'full,
-    'full,
-  > => _join(q, t2, getOn, INNER)
-
-  let leftJoin = (q: t<'p1, 's1>, t2: Table.t<'full, 'partial, 'optional>, getOn): S2.t<
-    'p1,
-    's1,
-    'optional,
-    'full,
-  > => _join(q, t2, getOn, LEFT)
-
-  let where = (q, getWhere) => {
-    ...q,
-    where: Some(getWhere(q.from.columns)),
-  }
-
-  let select = (q: t<'p1, _>, getProjection: ('p1 => {..}) as 'p) => Query.Select({
-    from: {name: q.from.name, alias: q.from.alias},
-    joins: [],
-    where: q.where,
-    limit: q.limit,
-    offset: q.offset,
-    projection: q.from.columns->getProjection->Utils.ensureNodes,
-  })
-
-  let selectAll = (q: t<'p1, _>) => Query.Select({
-    from: {name: q.from.name, alias: q.from.alias},
-    joins: [],
-    where: q.where,
-    limit: q.limit,
-    offset: q.offset,
-    projection: q.from.columns,
-  })
-
-  let toSubquery = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p =>
-    Node.makeSubquery({
-      from: {name: q.from.name, alias: q.from.alias},
-      joins: [],
-      where: q.where,
-      limit: q.limit,
-      offset: q.offset,
-      projection: {
-        value: q.from.columns->getProjection,
-      },
-    })
-}
-
-let from = (t1: Table.t<'full, 'partial, 'optional>): S1.t<'full, 'full> => {
-  S1.from: {name: t1.name, alias: None, columns: t1.columns},
+let from = (table: Table.t<_>) => {
+  from: {name: table.name, alias: None},
+  joins: [],
   where: None,
   limit: None,
   offset: None,
+  _projectables: table.full,
+  _selectables: table.full,
 }
+
+let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
+  let _selectables = {
+    t1: Utils.getColumnsWithTableAlias(q._selectables, "t1"),
+    t2: Utils.getColumnsWithTableAlias(table.full, "t2"),
+  }
+
+  {
+    ...q,
+    from: {
+      ...q.from,
+      alias: Some("t1"),
+    },
+    joins: [
+      {
+        table: {
+          name: table.name,
+          alias: Some("t2"),
+        },
+        joinType,
+        on: getOn(_selectables),
+      },
+    ],
+    _projectables,
+    _selectables,
+  }
+}
+
+let innerJoin1 = (q, table, getOn) =>
+  _join1(
+    q,
+    table,
+    getOn,
+    INNER,
+    {
+      t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
+      t2: Utils.getColumnsWithTableAlias(table.full, "t2"),
+    },
+  )
+
+let leftJoin1 = (q, table, getOn) =>
+  _join1(
+    q,
+    table,
+    getOn,
+    LEFT,
+    {
+      t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
+      t2: Some(Utils.getColumnsWithTableAlias(table.full, "t2")),
+    },
+  )
+
+let where = (q, getWhere) => {
+  ...q,
+  where: q._selectables->getWhere->Some,
+}
+
+let limit = (q, limit) => {
+  ...q,
+  limit: Some(limit),
+}
+
+let offset = (q, offset) => {
+  ...q,
+  offset: Some(offset),
+}
+
+let selectAll = q =>
+  Query.Select({
+    from: q.from,
+    joins: q.joins,
+    where: q.where,
+    limit: q.limit,
+    offset: q.offset,
+    projection: q._projectables->Utils.ensureNodes,
+  })
+
+let select = (q, getProjection) => Query.Select({
+    from: q.from,
+    joins: q.joins,
+    where: q.where,
+    limit: q.limit,
+    offset: q.offset,
+    projection: q._projectables->getProjection->Utils.ensureNodes,
+})

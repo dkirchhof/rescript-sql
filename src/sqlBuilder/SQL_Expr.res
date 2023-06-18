@@ -1,5 +1,5 @@
 let toSQL = (expr: Expr.t) => {
   switch expr {
-  | EQUAL(left, right) => `${SQL_Node.toSQL(left)} = ${SQL_Node.toSQL(right)}`
+  | EQUAL(left, right) => `${SQL_Unknown.toSQL(left)} = ${SQL_Unknown.toSQL(right)}`
   }
 }

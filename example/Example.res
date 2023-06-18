@@ -18,13 +18,10 @@ module ArtistsTable = {
 
   type t = Table.t<full, partial, optional>
 
-  let table: t = {
-    name: "artists",
-    columns: {
-      id: Node.makeColumn({name: "id", type_: "INTEGER"}),
-      name: Node.makeColumn({name: "name", type_: "TEXT"}),
-    },
-  }
+  let table: t = Table.make(
+    "artists",
+    [{name: "id", type_: "INTEGER"}, {name: "name", type_: "TEXT"}],
+  )
 }
 
 module SongsTable = {
@@ -48,81 +45,77 @@ module SongsTable = {
 
   type t = Table.t<full, partial, optional>
 
-  let table: t = {
-    name: "songs",
-    columns: {
-      id: Node.makeColumn({name: "id", type_: "INTEGER"}),
-      artistId: Node.makeColumn({name: "artistId", type_: "INTEGER"}),
-      name: Node.makeColumn({name: "name", type_: "TEXT"}),
-    },
-  }
+  let table: t = Table.make(
+    "songs",
+    [
+      {name: "id", type_: "INTEGER"},
+      {name: "artistId", type_: "INTEGER"},
+      {name: "name", type_: "TEXT"},
+    ],
+  )
 }
 
 /* end of generated code */
-
-%%raw(`
-  import { inspect } from "util";
-`)
-
-let log: 'a => unit = %raw(`
-  function log(message) {
-    if (typeof message === "string") {
-      console.log(message);
-    } else {
-      console.log(inspect(message, false, 5, true));
-    }
-  }
-`)
 
 open Select
 open Expr
 
 from(ArtistsTable.table)
-->S1.where(c => eq(c.id, 1))
-// ->S1.limit(1)
-// ->S1.offset(1)
-->S1.selectAll
+->selectAll
 ->SQL.toSQL
-->log
-
-from(ArtistsTable.table)->S1.select(c => {"name": c.name})->SQL.toSQL->log
+->Utils.log
 
 from(ArtistsTable.table)
-->S1.select(c => {"name": c.name, "someNumber": 1, "someString": "hello world"})
+->where(c => eq(c.id, 1))
+->limit(1)
+->offset(1)
+->select(c => {"name": c.name, "someNumber": 1, "someString": "hello world", "someBoolean": true})
 ->SQL.toSQL
-->log
+->Utils.log
 
 from(ArtistsTable.table)
-->S1.innerJoin(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-->S2.where(c => eq(c.t2.artistId, c.t1.id))
-->S2.select(c =>
-  {
-    "id": c.t1.id,
-    "name": c.t2.name,
-  }
-)
+->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+->selectAll
 ->SQL.toSQL
-->log
+->Utils.log
 
 from(ArtistsTable.table)
-->S1.leftJoin(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-->S2.where(c => eq(c.t2.artistId, c.t1.id))
-->S2.select(c =>
-  {
-    "id": c.t1.id,
-    "name": c.t2.name,
-  }
-)
+->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
 ->SQL.toSQL
-->log
+->Utils.log
 
 from(ArtistsTable.table)
-->S1.where(c => eq(c.id, from(ArtistsTable.table)->S1.toSubquery(c => c.id)))
-->S1.select(c =>
-  {
-    "id": c.id,
-    "name": c.name,
-  }
-)
+->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
 ->SQL.toSQL
-->log
+->Utils.log
+
+from(ArtistsTable.table)
+->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+->selectAll
+->SQL.toSQL
+->Utils.log
+
+from(ArtistsTable.table)
+->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+->select(c => {"artistName": c.t1.name, "songName": Option.map(c.t2, t2 => t2.name)})
+->SQL.toSQL
+->Utils.log
+
+from(ArtistsTable.table)
+->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
+->SQL.toSQL
+->Utils.log
+
+// from(ArtistsTable.table)
+// ->S1.where(c => eq(c.id, from(ArtistsTable.table)->S1.toSubquery(c => c.id)))
+// ->S1.select(c =>
+//   {
+//     "id": c.id,
+//     "name": c.name,
+//   }
+// )
+// ->SQL.toSQL
+// ->log

@@ -1,34 +1,46 @@
 open Select_Executable
 
-let projectionToSQL = projection => {
-  let projection = Obj.magic(projection)
+let makeAlias = (path, alias) => {
+  Array.concat(path, [alias])->Array.joinWith(".")
+}
 
-  let fields =
+let projectionToSQL = projection => {
+  let rec getFields = (projection, path) => {
     projection
     ->Dict.toArray
-    ->Array.map(((alias, node)) => {
-      let nodeAsSQL = SQL_Node.toSQL(node)
+    ->Array.flatMap(((alias, node)) => {
+      let node = Node.fromUnknown(node)
 
-      if nodeAsSQL === alias {
-        nodeAsSQL
-      } else {
-        `${nodeAsSQL} AS ${alias}`
+      switch node {
+      | ProjectionGroup(group) => getFields(group, Array.concat(path, [alias]))
+      | _ => {
+          let nodeAsSQL = SQL_Node.toSQL(node)
+
+          if nodeAsSQL === alias {
+            [nodeAsSQL]
+          } else {
+            [`${nodeAsSQL} AS "${makeAlias(path, alias)}"`]
+          }
+        }
       }
     })
+  }
+
+  let fields = projection->Obj.magic->getFields([])
 
   `SELECT ${Array.joinWith(fields, ", ")}`
 }
 
-let fromToSQL = source => {
+let fromToSQL = (source: Source.t) => {
   switch source.alias {
   | Some(alias) => `FROM ${source.name} AS ${alias}`
   | None => `FROM ${source.name}`
   }
 }
 
-external joinTypeToString: JoinType.t => string = "%identity"
+external joinTypeToString: Join.joinType => string = "%identity"
 
-let joinsToSQL = (joins: array<join>) => {
+let joinsToSQL = (joins: array<Join.t>) => {
   joins->Array.map(join => {
     open StringBuilder
 
@@ -63,10 +75,11 @@ let toSQL = q => {
   ->addS(0, fromToSQL(q.from))
   ->addM(0, joinsToSQL(q.joins))
   ->addSO(0, whereToSQL(q.where))
-  // ->addSO(0, groupByToSQL(q.groupBy))
-  // ->addSO(0, havingToSQL(q.having))
-  // ->addSO(0, orderByToSQL(q.orderBy))
+  // // ->addSO(0, groupByToSQL(q.groupBy))
+  // // ->addSO(0, havingToSQL(q.having))
+  // // ->addSO(0, orderByToSQL(q.orderBy))
   ->addSO(0, limitToSQL(q.limit))
   ->addSO(0, offsetToSQL(q.offset))
+  ->addS(0, "")
   ->build("\n")
 }

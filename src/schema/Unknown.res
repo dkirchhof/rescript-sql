@@ -2,8 +2,15 @@ type t
 
 let make: 'a => t = %raw(`
   function(any) {
-    if (any.TAG) {
-      return any;
+    if (typeof any === "object") {
+      if (any.TAG) {
+        return any;
+      }
+
+      return {
+        TAG: "ProjectionGroup",
+        _0: any,
+      };
     }
 
     if (typeof any === "string") {

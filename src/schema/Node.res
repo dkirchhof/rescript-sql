@@ -1,4 +1,5 @@
-type t<'a> =
+type rec t<'a> =
+  | ProjectionGroup(Dict.t<Unknown.t>)
   | Column(Column.t)
   | Subquery(Select_Executable.t<'a>)
   | StringLiteral(string)
