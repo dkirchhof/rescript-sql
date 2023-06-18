@@ -12,11 +12,9 @@ let addS = (builder, indentation, line) => {
 
 let addSO = (builder, indentation, optionalLine) => {
   switch optionalLine {
-  | Some(line) => addS(builder, indentation, line)->ignore
-  | None => ignore()
+  | Some(line) => addS(builder, indentation, line)
+  | None => builder
   }
-
-  builder
 }
 
 let addM = (builder, indentation, lines) => {
@@ -27,11 +25,9 @@ let addM = (builder, indentation, lines) => {
 
 let addMO = (builder, indentation, optionalLines) => {
   switch optionalLines {
-  | Some(lines) => addM(builder, indentation, lines)->ignore
-  | None => ignore()
+  | Some(lines) => addM(builder, indentation, lines)
+  | None => builder
   }
-
-  builder
 }
 
 let addE = builder => {

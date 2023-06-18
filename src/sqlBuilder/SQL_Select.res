@@ -59,6 +59,27 @@ let whereToSQL = where => {
   where->Option.map(expr => `WHERE ${SQL_Expr.toSQL(expr)}`)
 }
 
+external directionToString: OrderBy.direction => string = "%identity"
+
+let orderBysToSQL = (orderBys: array<OrderBy.t>) => {
+  switch orderBys {
+  | [] => None
+  | _ => {
+      let parts =
+        orderBys
+        ->Array.map(orderBy => {
+          let node = SQL_Unknown.toSQL(orderBy.node)
+          let direction = directionToString(orderBy.direction) 
+
+          `${node} ${direction}`
+        })
+        ->Array.joinWith(", ")
+
+      Some(`ORDER BY ${parts}`)
+    }
+  }
+}
+
 let limitToSQL = limit => {
   limit->Option.map(l => `LIMIT ${Int.toString(l)}`)
 }
@@ -77,7 +98,7 @@ let toSQL = q => {
   ->addSO(0, whereToSQL(q.where))
   // // ->addSO(0, groupByToSQL(q.groupBy))
   // // ->addSO(0, havingToSQL(q.having))
-  // // ->addSO(0, orderByToSQL(q.orderBy))
+  ->addSO(0, orderBysToSQL(q.orderBys))
   ->addSO(0, limitToSQL(q.limit))
   ->addSO(0, offsetToSQL(q.offset))
   ->addS(0, "")

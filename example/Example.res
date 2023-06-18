@@ -59,16 +59,12 @@ module SongsTable = {
 
 open Select
 open Expr
+open OrderBy
 
-from(ArtistsTable.table)
-->selectAll
-->SQL.toSQL
-->Utils.log
+from(ArtistsTable.table)->selectAll->SQL.toSQL->Utils.log
 
 from(ArtistsTable.table)
 ->where(c => eq(c.id, 1))
-->limit(1)
-->offset(1)
 ->select(c => {"name": c.name, "someNumber": 1, "someString": "hello world", "someBoolean": true})
 ->SQL.toSQL
 ->Utils.log
@@ -106,6 +102,25 @@ from(ArtistsTable.table)
 from(ArtistsTable.table)
 ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
 ->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
+->SQL.toSQL
+->Utils.log
+
+from(ArtistsTable.table)
+->where(c => eq(c.id, 1))
+->orderBy(c => [asc(c.name)])
+->limit(1)
+->offset(1)
+->selectAll
+->SQL.toSQL
+->Utils.log
+
+from(ArtistsTable.table)
+->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+->where(c => eq(c.t1.id, 1))
+->orderBy(c => [asc(c.t1.name)])
+->limit(1)
+->offset(1)
+->selectAll
 ->SQL.toSQL
 ->Utils.log
 
