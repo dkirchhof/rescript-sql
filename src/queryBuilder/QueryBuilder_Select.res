@@ -39,12 +39,12 @@
 // }
 
 type t<'a, 'b> = {
-  from: Source.t,
-  joins: array<Join.t>,
-  where: option<Expr.t>,
-  groupBy: array<GroupBy.t>,
-  having: option<Expr.t>,
-  orderBy: array<OrderBy.t>,
+  from: QueryBuilder_Source.t,
+  joins: array<QueryBuilder_Join.t>,
+  where: option<QueryBuilder_Expr.t>,
+  groupBy: array<QueryBuilder_GroupBy.t>,
+  having: option<QueryBuilder_Expr.t>,
+  orderBy: array<QueryBuilder_OrderBy.t>,
   limit: option<int>,
   offset: option<int>,
   _projectables: 'a,
@@ -77,8 +77,8 @@ let from = (table: Table.t<_>) => {
 
 let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
   let _selectables = {
-    t1: Utils.getColumnsWithTableAlias(q._selectables, "t1"),
-    t2: Utils.getColumnsWithTableAlias(table.select, "t2"),
+    t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._selectables, "t1"),
+    t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.select, "t2"),
   }
 
   {
@@ -109,8 +109,8 @@ let innerJoin1 = (q, table, getOn) =>
     getOn,
     INNER,
     {
-      t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Utils.getColumnsWithTableAlias(table.select, "t2"),
+      t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
+      t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.select, "t2"),
     },
   )
 
@@ -121,8 +121,8 @@ let leftJoin1 = (q, table, getOn) =>
     getOn,
     LEFT,
     {
-      t1: Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Some(Utils.getColumnsWithTableAlias(table.select, "t2")),
+      t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
+      t2: Some(QueryBuilder_Utils.getColumnsWithTableAlias(table.select, "t2")),
     },
   )
 
@@ -157,7 +157,7 @@ let offset = (q, offset) => {
 }
 
 let selectAll = q => {
-  Select_Executable.from: q.from,
+  QueryBuilder_Select_Executable.from: q.from,
   joins: q.joins,
   where: q.where,
   groupBy: q.groupBy,
@@ -165,11 +165,11 @@ let selectAll = q => {
   orderBy: q.orderBy,
   limit: q.limit,
   offset: q.offset,
-  projection: q._projectables->Utils.ensureNodes,
+  projection: q._projectables->QueryBuilder_Utils.ensureNodes,
 }
 
 let select = (q, getProjection) => {
-  Select_Executable.from: q.from,
+  QueryBuilder_Select_Executable.from: q.from,
   joins: q.joins,
   where: q.where,
   groupBy: q.groupBy,
@@ -177,5 +177,5 @@ let select = (q, getProjection) => {
   orderBy: q.orderBy,
   limit: q.limit,
   offset: q.offset,
-  projection: q._projectables->getProjection->Utils.ensureNodes,
+  projection: q._projectables->getProjection->QueryBuilder_Utils.ensureNodes,
 }

@@ -29,7 +29,7 @@
 //   make()->addS(0, `CREATE TABLE ${q.table.name} (`)->addS(0, innerString)->addS(0, `)`)->build("\n")
 // }
 
-let toSQL = (q: CreateTable.t<_>) => {
+let toSQL = (q: QueryBuilder_CreateTable.t<_>) => {
   open StringBuilder
 
   let columns =

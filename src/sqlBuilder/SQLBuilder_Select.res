@@ -1,4 +1,4 @@
-open Select_Executable
+open QueryBuilder_Select_Executable
 
 let makeAlias = (path, alias) => {
   Array.concat(path, [alias])->Array.joinWith(".")
@@ -31,16 +31,16 @@ let projectionToSQL = projection => {
   `SELECT ${Array.joinWith(fields, ", ")}`
 }
 
-let fromToSQL = (source: Source.t) => {
+let fromToSQL = (source: QueryBuilder_Source.t) => {
   switch source.alias {
   | Some(alias) => `FROM ${source.name} AS ${alias}`
   | None => `FROM ${source.name}`
   }
 }
 
-external joinTypeToString: Join.joinType => string = "%identity"
+external joinTypeToString: QueryBuilder_Join.joinType => string = "%identity"
 
-let joinsToSQL = (joins: array<Join.t>) => {
+let joinsToSQL = (joins: array<QueryBuilder_Join.t>) => {
   joins->Array.map(join => {
     open StringBuilder
 
@@ -59,7 +59,7 @@ let whereToSQL = where => {
   where->Option.map(expr => `WHERE ${SQLBuilder_Expr.toSQL(expr)}`)
 }
 
-let groupByToSQL = (groupBys: array<GroupBy.t>) => {
+let groupByToSQL = (groupBys: array<QueryBuilder_GroupBy.t>) => {
   switch groupBys {
   | [] => None
   | _ => {
@@ -74,9 +74,9 @@ let havingToSQL = having => {
   having->Option.map(expr => `HAVING ${SQLBuilder_Expr.toSQL(expr)}`)
 }
 
-external directionToString: OrderBy.direction => string = "%identity"
+external directionToString: QueryBuilder_OrderBy.direction => string = "%identity"
 
-let orderByToSQL = (orderBys: array<OrderBy.t>) => {
+let orderByToSQL = (orderBys: array<QueryBuilder_OrderBy.t>) => {
   switch orderBys {
   | [] => None
   | _ => {
