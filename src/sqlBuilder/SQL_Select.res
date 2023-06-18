@@ -70,6 +70,10 @@ let groupByToSQL = (groupBys: array<GroupBy.t>) => {
   }
 }
 
+let havingToSQL = having => {
+  having->Option.map(expr => `HAVING ${SQL_Expr.toSQL(expr)}`)
+}
+
 external directionToString: OrderBy.direction => string = "%identity"
 
 let orderByToSQL = (orderBys: array<OrderBy.t>) => {
@@ -108,7 +112,7 @@ let toSQL = q => {
   ->addM(0, joinsToSQL(q.joins))
   ->addSO(0, whereToSQL(q.where))
   ->addSO(0, groupByToSQL(q.groupBy))
-  // // ->addSO(0, havingToSQL(q.having))
+  ->addSO(0, havingToSQL(q.having))
   ->addSO(0, orderByToSQL(q.orderBy))
   ->addSO(0, limitToSQL(q.limit))
   ->addSO(0, offsetToSQL(q.offset))

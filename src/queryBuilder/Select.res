@@ -43,6 +43,7 @@ type t<'a, 'b> = {
   joins: array<Join.t>,
   where: option<Expr.t>,
   groupBy: array<GroupBy.t>,
+  having: option<Expr.t>,
   orderBy: array<OrderBy.t>,
   limit: option<int>,
   offset: option<int>,
@@ -68,6 +69,7 @@ let from = (table: Table.t<_>) => {
   joins: [],
   where: None,
   groupBy: [],
+  having: None,
   orderBy: [],
   limit: None,
   offset: None,
@@ -136,6 +138,11 @@ let groupBy = (q, getGroupBy) => {
   groupBy: getGroupBy(q._selectables)
 }
 
+let having = (q, getHaving) => {
+  ...q,
+  having: q._selectables->getHaving->Some,
+}
+
 let orderBy = (q, getOrderBy) => {
   ...q,
   orderBy: getOrderBy(q._selectables)
@@ -157,6 +164,7 @@ let selectAll = q =>
     joins: q.joins,
     where: q.where,
     groupBy: q.groupBy,
+    having: q.having,
     orderBy: q.orderBy,
     limit: q.limit,
     offset: q.offset,
@@ -168,6 +176,7 @@ let select = (q, getProjection) => Query.Select({
     joins: q.joins,
     where: q.where,
     groupBy: q.groupBy,
+    having: q.having,
     orderBy: q.orderBy,
     limit: q.limit,
     offset: q.offset,
