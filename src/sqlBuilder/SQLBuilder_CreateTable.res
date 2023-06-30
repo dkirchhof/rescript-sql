@@ -68,6 +68,5 @@ let toSQL = (q: QueryBuilder_CreateTable.t<_>) => {
   ->addS(0, `CREATE TABLE ${q.tableName} (`)
   ->addS(0, body)
   ->addS(0, `)`)
-  ->addS(0, "")
   ->build("\n")
 }

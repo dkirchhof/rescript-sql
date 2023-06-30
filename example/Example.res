@@ -57,90 +57,129 @@ module SongsTable = {
 
 /* end of generated code */
 
-open QueryBuilder.CreateTable
-open SQLBuilder.CreateTable
+module DB = RescriptSQL.MakeSync({
+  type connection = BetterSQLite3.connection
 
-createTable(ArtistsTable.table)->toSQL->Logger.log
-createTable(SongsTable.table)->toSQL->Logger.log
+  let execute = BetterSQLite3.exec
+  let getRows = (connection, sql) => BetterSQLite3.prepare(connection, sql)->BetterSQLite3.all
+})
 
-// open Select
-// open Expr
-// open OrderBy
-// open GroupBy
+let connection = BetterSQLite3.createConnection(":memory:")
 
-// from(ArtistsTable.table)->selectAll->SQL_Select.toSQL->Logger.log
+let ddl = () => {
+  open DB.CreateTable
 
-// from(ArtistsTable.table)
-// ->where(c => eq(c.id, 1))
-// ->select(c => {"name": c.name, "someNumber": 1, "someString": "hello world", "someBoolean": true})
-// ->SQL_Select.toSQL
-// ->Logger.log
+  let logAndExecute = query => {
+    query->toSQL->Logger.log
+    query->execute(connection)->Logger.log
+  }
 
-// from(ArtistsTable.table)
-// ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-// ->selectAll
-// ->SQL_Select.toSQL
-// ->Logger.log
+  createTable(ArtistsTable.table)->logAndExecute
+  createTable(SongsTable.table)->logAndExecute
+}
 
-// from(ArtistsTable.table)
-// ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-// ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
-// ->SQL_Select.toSQL
-// ->Logger.log
+let dml = () => {
+  BetterSQLite3.exec(connection, `INSERT INTO artists VALUES(1, 'Artist 1')`)
+  BetterSQLite3.exec(connection, `INSERT INTO artists VALUES(2, 'Artist 2')`)
+  BetterSQLite3.exec(connection, `INSERT INTO artists VALUES(3, 'Artist 3')`)
 
-// from(ArtistsTable.table)
-// ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-// ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
-// ->SQL_Select.toSQL
-// ->Logger.log
+  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(11, 1, 'Song 1_1')`)
+  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(12, 1, 'Song 1_2')`)
+  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(13, 1, 'Song 1_3')`)
+  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(21, 2, 'Song 2_1')`)
+}
 
-// from(ArtistsTable.table)
-// ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-// ->selectAll
-// ->SQL_Select.toSQL
-// ->Logger.log
+let dql = () => {
+  open DB.Select
+  open DB.Expr
+  open DB.GroupBy
+  open DB.OrderBy
 
-// from(ArtistsTable.table)
-// ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-// ->select(c => {"artistName": c.t1.name, "songName": Option.map(c.t2, t2 => t2.name)})
-// ->SQL_Select.toSQL
-// ->Logger.log
+  let logAndExecute = query => {
+    query->toSQL->Logger.log
+    query->execute(connection)->Logger.log
+  }
 
-// from(ArtistsTable.table)
-// ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-// ->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
-// ->SQL_Select.toSQL
-// ->Logger.log
+  from(ArtistsTable.table)->selectAll->logAndExecute
 
-// from(ArtistsTable.table)
-// ->where(c => eq(c.id, 1))
-// ->groupBy(c => [group(c.id), group(c.name)])
-// ->having(c => eq(c.id, 1))
-// ->orderBy(c => [asc(c.id), desc(c.name)])
-// ->limit(1)
-// ->offset(1)
-// ->selectAll
-// ->SQL_Select.toSQL
-// ->Logger.log
+  from(ArtistsTable.table)
+  ->where(c => eq(c.id, 1))
+  ->select(c =>
+    {
+      "name": c.name,
+      "someNumber": 1,
+      "someString": "hello world",
+      "someBoolean": true,
+    }
+  )
+  ->logAndExecute
 
-// from(ArtistsTable.table)
-// ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
-// ->where(c => eq(c.t1.id, 1))
-// ->groupBy(c => [group(c.t1.id), group(c.t2.name)])
-// ->having(c => eq(c.t1.id, 1))
-// ->orderBy(c => [asc(c.t1.id), desc(c.t2.name)])
-// ->limit(1)
-// ->offset(1)
-// ->selectAll
-// ->SQL_Select.toSQL
-// ->Logger.log
+  from(ArtistsTable.table)
+  ->select(c => {"a": {"c": c.name, "d": 1, "e": {"someBoolean": true}}})
+  ->logAndExecute
 
-// // from(ArtistsTable.table)
-// // ->S1.where(c => eq(c.id, from(ArtistsTable.table)->S1.toSubquery(c => c.id)))
-// // ->S1.select(c =>
-// //   {
-// //     "id": c.id,
-// //     "name": c.name,
-// //   }
-// // )
-// // ->log
+  from(ArtistsTable.table)
+  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  ->selectAll
+  ->logAndExecute
+
+  from(ArtistsTable.table)
+  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
+  ->logAndExecute
+
+  from(ArtistsTable.table)
+  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
+  ->logAndExecute
+
+  from(ArtistsTable.table)
+  ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  ->selectAll
+  ->logAndExecute
+
+  from(ArtistsTable.table)
+  ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  ->select(c => {"artistName": c.t1.name, "songName": Option.map(c.t2, t2 => t2.name)})
+  ->logAndExecute
+
+  from(ArtistsTable.table)
+  ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  ->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
+  ->logAndExecute
+
+  from(ArtistsTable.table)
+  ->where(c => eq(c.id, 1))
+  ->groupBy(c => [group(c.id), group(c.name)])
+  ->having(c => eq(c.id, 1))
+  ->orderBy(c => [asc(c.id), desc(c.name)])
+  ->limit(1)
+  ->offset(1)
+  ->selectAll
+  ->logAndExecute
+
+  from(ArtistsTable.table)
+  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  ->where(c => eq(c.t1.id, 1))
+  ->groupBy(c => [group(c.t1.id), group(c.t2.name)])
+  ->having(c => eq(c.t1.id, 1))
+  ->orderBy(c => [asc(c.t1.id), desc(c.t2.name)])
+  ->limit(1)
+  ->offset(1)
+  ->selectAll
+  ->logAndExecute
+
+  // from(ArtistsTable.table)
+  // ->S1.where(c => eq(c.id, from(ArtistsTable.table)->S1.toSubquery(c => c.id)))
+  // ->S1.select(c =>
+  //   {
+  //     "id": c.id,
+  //     "name": c.name,
+  //   }
+  // )
+  // ->log
+}
+
+ddl()
+dml()
+dql()

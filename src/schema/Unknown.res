@@ -9,7 +9,9 @@ let make: 'a => t = %raw(`
 
       return {
         TAG: "ProjectionGroup",
-        _0: any,
+        _0: Object.fromEntries(
+          Object.entries(any).map(([key, value]) => [key, make(value)])
+        ),
       };
     }
 
@@ -33,5 +35,7 @@ let make: 'a => t = %raw(`
         _0: any,
       }
     }
+
+    return null;
   }
 `)

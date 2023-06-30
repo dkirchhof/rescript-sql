@@ -1,32 +1,29 @@
 open QueryBuilder_Select_Executable
 
-let makeAlias = (path, alias) => {
-  Array.concat(path, [alias])->Array.joinWith(".")
-}
-
 let projectionToSQL = projection => {
   let rec getFields = (projection, path) => {
     projection
     ->Dict.toArray
     ->Array.flatMap(((alias, node)) => {
       let node = Node.fromUnknown(node)
+      let fullAlias = `${path}${alias}`
 
       switch node {
-      | ProjectionGroup(group) => getFields(group, Array.concat(path, [alias]))
+      | ProjectionGroup(group) => getFields(group, `${fullAlias}.`)
       | _ => {
           let nodeAsSQL = SQLBuilder_Node.toSQL(node)
 
           if nodeAsSQL === alias {
             [nodeAsSQL]
           } else {
-            [`${nodeAsSQL} AS "${makeAlias(path, alias)}"`]
+            [`${nodeAsSQL} AS "${fullAlias}"`]
           }
         }
       }
     })
   }
 
-  let fields = projection->Obj.magic->getFields([])
+  let fields = projection->Obj.magic->getFields("")
 
   `SELECT ${Array.joinWith(fields, ", ")}`
 }
@@ -116,6 +113,5 @@ let toSQL = q => {
   ->addSO(0, orderByToSQL(q.orderBy))
   ->addSO(0, limitToSQL(q.limit))
   ->addSO(0, offsetToSQL(q.offset))
-  ->addS(0, "")
   ->build("\n")
 }

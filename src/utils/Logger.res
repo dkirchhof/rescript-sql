@@ -9,6 +9,8 @@ let log: 'a => unit = %raw(`
     } else {
       console.log(inspect(message, false, 5, true));
     }
+
+    console.log("");
   }
 `)
 
