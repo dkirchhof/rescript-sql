@@ -21,6 +21,17 @@ module MakeSync = (SyncAdapter: SyncAdapter) => {
     }
   }
 
+  module InsertInto = {
+    include QueryBuilder_InsertInto
+    include SQLBuilder_InsertInto
+
+    let execute = (query, connection) => {
+      let sql = SQLBuilder_InsertInto.toSQL(query)
+
+      SyncAdapter.execute(connection, sql)
+    }
+  }
+
   module Select = {
     include QueryBuilder_Select
     include SQLBuilder_Select

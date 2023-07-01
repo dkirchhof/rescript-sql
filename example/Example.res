@@ -7,7 +7,7 @@ module ArtistsTable = {
   }
 
   type insert = {
-    id?: int,
+    id: int,
     name: string,
   }
 
@@ -32,7 +32,7 @@ module SongsTable = {
   }
 
   type insert = {
-    id?: int,
+    id: int,
     artistId: int,
     name: string,
   }
@@ -79,14 +79,25 @@ let ddl = () => {
 }
 
 let dml = () => {
-  BetterSQLite3.exec(connection, `INSERT INTO artists VALUES(1, 'Artist 1')`)
-  BetterSQLite3.exec(connection, `INSERT INTO artists VALUES(2, 'Artist 2')`)
-  BetterSQLite3.exec(connection, `INSERT INTO artists VALUES(3, 'Artist 3')`)
+  open DB.InsertInto
 
-  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(11, 1, 'Song 1_1')`)
-  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(12, 1, 'Song 1_2')`)
-  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(13, 1, 'Song 1_3')`)
-  BetterSQLite3.exec(connection, `INSERT INTO songs VALUES(21, 2, 'Song 2_1')`)
+  let logAndExecute = query => {
+    query->toSQL->Logger.log
+    query->execute(connection)->Logger.log
+  }
+
+  insertInto(ArtistsTable.table)
+  ->values([{id: 1, name: "Artist 1"}, {id: 2, name: "Artist 2"}, {id: 3, name: "Artist 3"}])
+  ->logAndExecute
+
+  insertInto(SongsTable.table)
+  ->values([
+    {id: 11, artistId: 1, name: "Song 1_1"},
+    {id: 12, artistId: 1, name: "Song 1_2"},
+    {id: 13, artistId: 1, name: "Song 1_3"},
+    {id: 21, artistId: 2, name: "Song 2_1"},
+  ])
+  ->logAndExecute
 }
 
 let dql = () => {
