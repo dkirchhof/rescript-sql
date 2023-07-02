@@ -1,18 +1,18 @@
-type t<'select, 'update> = {
+type t<'columns, 'update> = {
   tableName: string,
-  columns: 'select,
+  columns: 'columns,
 }
 
-type tx<'select, 'update> = {
+type tx<'columns, 'update> = {
   tableName: string,
-  columns: 'select,
+  columns: 'columns,
   patch: 'update,
   where: option<QueryBuilder_Expr.t>,
 }
 
-let update = (table: Table.t<'select, _, 'update>): t<'select, 'update> => {
+let update = (table: Table.t<'columns, _, 'update>): t<'columns, 'update> => {
   tableName: table.name,
-  columns: table.select,
+  columns: table.columns,
 }
 
 let set = (q: t<_, 'update>, patch: 'update) => {
@@ -22,7 +22,7 @@ let set = (q: t<_, 'update>, patch: 'update) => {
   where: None,
 }
 
-let where = (q: tx<'select, _>, getWhere) => {
+let where = (q: tx<'columns, _>, getWhere) => {
   ...q,
   where: q.columns->getWhere->Some,
 }

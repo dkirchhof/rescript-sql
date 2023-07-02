@@ -1,8 +1,6 @@
-type t<'select, 'insert, 'update> = {
+type t<'columns, 'insert, 'update> = {
   name: string,
-  select: 'select,
-  insert: 'insert,
-  update: 'update,
+  columns: 'columns,
   constraints: array<Constraint.t>,
 }
 
@@ -14,9 +12,7 @@ let make = (name, columns: array<Column.t>, constraints: array<Constraint.t>) =>
 
   {
     name,
-    select: Obj.magic(columns),
-    insert: Obj.magic(columns),
-    update: Obj.magic(columns),
+    columns: Obj.magic(columns),
     constraints,
   }
 }

@@ -62,7 +62,7 @@ type columns2<'a, 'b> = {
   t2: 'b,
 }
 
-let from = (table: Table.t<_>) => {
+let from = (table: Table.t<'columns, _, _>): t<'columns, 'columns> => {
   from: {name: table.name, alias: None},
   joins: [],
   where: None,
@@ -71,14 +71,14 @@ let from = (table: Table.t<_>) => {
   orderBy: [],
   limit: None,
   offset: None,
-  _projectables: table.select,
-  _selectables: table.select,
+  _projectables: table.columns,
+  _selectables: table.columns,
 }
 
 let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
   let _selectables = {
     t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._selectables, "t1"),
-    t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.select, "t2"),
+    t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.columns, "t2"),
   }
 
   {
@@ -102,7 +102,10 @@ let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
   }
 }
 
-let innerJoin1 = (q, table, getOn) =>
+let innerJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _>, getOn): t<
+  columns2<'p1, 'columns>,
+  columns2<'s1, 'columns>,
+> =>
   _join1(
     q,
     table,
@@ -110,11 +113,14 @@ let innerJoin1 = (q, table, getOn) =>
     INNER,
     {
       t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.select, "t2"),
+      t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.columns, "t2"),
     },
   )
 
-let leftJoin1 = (q, table, getOn) =>
+let leftJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _>, getOn): t<
+  columns2<'p1, option<'columns>>,
+  columns2<'s1, 'columns>,
+> =>
   _join1(
     q,
     table,
@@ -122,7 +128,7 @@ let leftJoin1 = (q, table, getOn) =>
     LEFT,
     {
       t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Some(QueryBuilder_Utils.getColumnsWithTableAlias(table.select, "t2")),
+      t2: Some(QueryBuilder_Utils.getColumnsWithTableAlias(table.columns, "t2")),
     },
   )
 

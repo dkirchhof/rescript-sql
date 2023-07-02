@@ -6,6 +6,6 @@ type t<'a> = {
 
 let createTable = (table: Table.t<_>) => {
   tableName: table.name, 
-  columns: table.select,
+  columns: table.columns,
   constraints: table.constraints,
 }
