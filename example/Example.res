@@ -112,6 +112,18 @@ let dml = () => {
   ->logAndExecute
 }
 
+let dml2 = () => {
+  open DB.Update
+  open DB.Expr
+
+  let logAndExecute = query => {
+    query->toSQL->Logger.log
+    query->execute(connection)->Logger.log
+  }
+
+  update(ArtistsTable.table)->set({name: "Artist 1!"})->where(c => eq(c.id, 1))->logAndExecute
+}
+
 let dql = () => {
   open DB.Select
   open DB.Expr
@@ -204,5 +216,6 @@ let dql = () => {
 }
 
 ddl()
-// dml()
+dml()
+dml2()
 // dql()

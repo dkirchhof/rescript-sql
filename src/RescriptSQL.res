@@ -15,7 +15,7 @@ module MakeSync = (SyncAdapter: SyncAdapter) => {
     include SQLBuilder_CreateTable
 
     let execute = (query, connection) => {
-      let sql = SQLBuilder_CreateTable.toSQL(query)
+      let sql = toSQL(query)
 
       SyncAdapter.execute(connection, sql)
     }
@@ -26,7 +26,18 @@ module MakeSync = (SyncAdapter: SyncAdapter) => {
     include SQLBuilder_InsertInto
 
     let execute = (query, connection) => {
-      let sql = SQLBuilder_InsertInto.toSQL(query)
+      let sql = toSQL(query)
+
+      SyncAdapter.execute(connection, sql)
+    }
+  }
+
+  module Update = {
+    include QueryBuilder_Update
+    include SQLBuilder_Update
+
+    let execute = (query, connection) => {
+      let sql = toSQL(query)
 
       SyncAdapter.execute(connection, sql)
     }
@@ -37,7 +48,7 @@ module MakeSync = (SyncAdapter: SyncAdapter) => {
     include SQLBuilder_Select
 
     let execute = (query, connection) => {
-      let sql = SQLBuilder_Select.toSQL(query)
+      let sql = toSQL(query)
       let rows = SyncAdapter.getRows(connection, sql)
 
       Array.map(rows, row => ResultMapper.map(query.projection, row))
