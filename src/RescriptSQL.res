@@ -43,6 +43,17 @@ module MakeSync = (SyncAdapter: SyncAdapter) => {
     }
   }
 
+  module DeleteFrom = {
+    include QueryBuilder_DeleteFrom
+    include SQLBuilder_DeleteFrom
+
+    let execute = (query, connection) => {
+      let sql = toSQL(query)
+
+      SyncAdapter.execute(connection, sql)
+    }
+  }
+
   module Select = {
     include QueryBuilder_Select
     include SQLBuilder_Select

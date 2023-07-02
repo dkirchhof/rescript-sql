@@ -78,7 +78,7 @@ module DB = RescriptSQL.MakeSync({
 
 let connection = BetterSQLite3.createConnection(":memory:")
 
-let ddl = () => {
+let createExample = () => {
   open DB.CreateTable
 
   let logAndExecute = query => {
@@ -90,7 +90,7 @@ let ddl = () => {
   createTable(SongsTable.table)->logAndExecute
 }
 
-let dml = () => {
+let insertExample = () => {
   open DB.InsertInto
 
   let logAndExecute = query => {
@@ -112,16 +112,52 @@ let dml = () => {
   ->logAndExecute
 }
 
-let dml2 = () => {
-  open DB.Update
-  open DB.Expr
+let crudExample = () => {
+  let create = () => {
+    open DB.InsertInto
 
-  let logAndExecute = query => {
+    let query = insertInto(ArtistsTable.table)->values([{id: 100, name: "DELETEME"}])
+
     query->toSQL->Logger.log
     query->execute(connection)->Logger.log
   }
 
-  update(ArtistsTable.table)->set({name: "Artist 1!"})->where(c => eq(c.id, 1))->logAndExecute
+  let read = () => {
+    open DB.Select
+
+    let query = from(ArtistsTable.table)->selectAll
+
+    query->toSQL->Logger.log
+    query->execute(connection)->Logger.log
+  }
+
+  let update = () => {
+    open DB.Update
+    open DB.Expr
+
+    let query = update(ArtistsTable.table)->set({name: "DELETEME!!!"})->where(c => eq(c.id, 100))
+
+    query->toSQL->Logger.log
+    query->execute(connection)->Logger.log
+  }
+
+  let delete = () => {
+    open DB.DeleteFrom
+    open DB.Expr
+
+    let query = deleteFrom(ArtistsTable.table)->where(c => eq(c.id, 100))
+
+    query->toSQL->Logger.log
+    query->execute(connection)->Logger.log
+
+  }
+
+  create()
+  read()
+  update()
+  read()
+  delete()
+  read()
 }
 
 let dql = () => {
@@ -215,7 +251,7 @@ let dql = () => {
   // ->log
 }
 
-ddl()
-dml()
-dml2()
+createExample()
+insertExample()
+crudExample()
 // dql()
