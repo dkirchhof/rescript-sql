@@ -3,9 +3,10 @@ type t<'select, 'insert, 'update> = {
   select: 'select,
   insert: 'insert,
   update: 'update,
+  constraints: array<Constraint.t>,
 }
 
-let make = (name, columns: array<Column.t>) => {
+let make = (name, columns: array<Column.t>, constraints: array<Constraint.t>) => {
   let columns =
     columns
     ->Array.map(config => (config.name, Node.Column(config)))
@@ -16,5 +17,6 @@ let make = (name, columns: array<Column.t>) => {
     select: Obj.magic(columns),
     insert: Obj.magic(columns),
     update: Obj.magic(columns),
+    constraints,
   }
 }

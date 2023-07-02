@@ -7,7 +7,7 @@ module ArtistsTable = {
   }
 
   type insert = {
-    id: int,
+    id?: int,
     name: string,
   }
 
@@ -21,6 +21,7 @@ module ArtistsTable = {
   let table: t = Table.make(
     "artists",
     [{name: "id", type_: "INTEGER", notNull: true}, {name: "name", type_: "TEXT", notNull: true}],
+    [PrimaryKey({name: "pk", columns: ["id"]}), Unique({name: "unique_name", columns: ["name"]})],
   )
 }
 
@@ -32,7 +33,7 @@ module SongsTable = {
   }
 
   type insert = {
-    id: int,
+    id?: int,
     artistId: int,
     name: string,
   }
@@ -51,6 +52,17 @@ module SongsTable = {
       {name: "id", type_: "INTEGER", notNull: true},
       {name: "artistId", type_: "INTEGER", notNull: true},
       {name: "name", type_: "TEXT", notNull: true},
+    ],
+    [
+      PrimaryKey({name: "pk", columns: ["id"]}),
+      ForeignKey({
+        name: "fkArtist",
+        columns: ["artistId"],
+        foreignTableName: "artists",
+        foreignColumns: ["id"],
+        onUpdate: NoAction,
+        onDelete: Cascade,
+      }),
     ],
   )
 }
@@ -87,7 +99,7 @@ let dml = () => {
   }
 
   insertInto(ArtistsTable.table)
-  ->values([{id: 1, name: "Artist 1"}, {id: 2, name: "Artist 2"}, {id: 3, name: "Artist 3"}])
+  ->values([{name: "Artist 1"}, {name: "Artist 2"}, {name: "Artist 3"}])
   ->logAndExecute
 
   insertInto(SongsTable.table)
@@ -192,5 +204,5 @@ let dql = () => {
 }
 
 ddl()
-dml()
-dql()
+// dml()
+// dql()
