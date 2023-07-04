@@ -18,11 +18,14 @@ module ArtistsTable = {
 
   type t = Table.t<select, insert, update>
 
-  let table: t = Table.make(
-    "artists",
-    [{name: "id", type_: "INTEGER", notNull: true}, {name: "name", type_: "TEXT", notNull: true}],
-    [PrimaryKey({name: "pk", columns: ["id"]}), Unique({name: "unique_name", columns: ["name"]})],
-  )
+  let table: t = {
+    name: "artists",
+    columns: Obj.magic({
+      "id": Node.Column({name: "id", type_: INTEGER, notNull: true}), 
+      "name": Node.Column({name: "name", type_: TEXT, notNull: true}),
+    }),
+    constraints: [PrimaryKey({name: "pk", columns: ["id"]}), Unique({name: "unique_name", columns: ["name"]})],
+  }
 }
 
 module SongsTable = {
@@ -46,14 +49,14 @@ module SongsTable = {
 
   type t = Table.t<select, insert, update>
 
-  let table: t = Table.make(
-    "songs",
-    [
-      {name: "id", type_: "INTEGER", notNull: true},
-      {name: "artistId", type_: "INTEGER", notNull: true},
-      {name: "name", type_: "TEXT", notNull: true},
-    ],
-    [
+  let table: t = {
+    name: "songs",
+    columns: Obj.magic({
+      "id": Node.Column({name: "id", type_: INTEGER, notNull: true}),
+      "artistId": Node.Column({name: "artistId", type_: INTEGER, notNull: true}),
+      "name": Node.Column({name: "name", type_: TEXT, notNull: true}),
+    }),
+    constraints: [
       PrimaryKey({name: "pk", columns: ["id"]}),
       ForeignKey({
         name: "fkArtist",
@@ -64,7 +67,7 @@ module SongsTable = {
         onDelete: Cascade,
       }),
     ],
-  )
+  }
 }
 
 /* end of generated code */
@@ -77,18 +80,6 @@ module DB = RescriptSQL.MakeSync({
 })
 
 let connection = BetterSQLite3.createConnection(":memory:")
-
-let createExample = () => {
-  open DB.CreateTable
-
-  let logAndExecute = query => {
-    query->toSQL->Logger.log
-    query->execute(connection)->Logger.log
-  }
-
-  createTable(ArtistsTable.table)->logAndExecute
-  createTable(SongsTable.table)->logAndExecute
-}
 
 let insertExample = () => {
   open DB.InsertInto
@@ -251,7 +242,6 @@ let dql = () => {
   // ->log
 }
 
-createExample()
 insertExample()
 crudExample()
-// dql()
+dql()

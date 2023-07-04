@@ -1,39 +1,12 @@
-// let fromCreateTableQuery = (q: QueryBuilder.CreateTable.t<_>) => {
-//   let innerString =
-//     make()
-//     ->addM(
-//       2,
-//       q.table.columns
-//       ->Schema.Column.dictFromRecord
-//       ->Js.Dict.entries
-//       ->Js.Array2.map(((name, column)) => {
-//         let sizeString = switch column.size {
-//         | Some(size) => `(${size->Belt.Int.toString})`
-//         | None => ""
-//         }
-
-//         let notNullString = column.nullable ? "" : " NOT NULL"
-
-//         `${name} ${(column.dbType :> string)}${sizeString}${notNullString}`
-//       }),
-//     )
-//     ->addM(
-//       2,
-//       q.table.constraints
-//       ->Obj.magic
-//       ->Js.Dict.entries
-//       ->Js.Array2.map(((name, cnstraint: Schema.Constraint.t)) => constraintToSQL(name, cnstraint)),
-//     )
-//     ->build(",\n")
-
-//   make()->addS(0, `CREATE TABLE ${q.table.name} (`)->addS(0, innerString)->addS(0, `)`)->build("\n")
-// }
+external columnTypeToSQL: Column.columnType => string = "%identity"
 
 let columnToSQL = (column: Column.t) => {
   //     let sizeString = switch column.size {
   //     | Some(size) => `(${size->Belt.Int.toString})`
   //     | None => ""
   //     }
+
+  let type_ = columnTypeToSQL(column.type_)
 
   let notNull = column.notNull ? " NOT NULL" : ""
 
@@ -42,7 +15,7 @@ let columnToSQL = (column: Column.t) => {
   | _ => ""
   }
 
-  `${column.name} ${column.type_}${notNull}${autoIncrement}`
+  `${column.name} ${type_}${notNull}${autoIncrement}`
 }
 
 let constraintToSQL = (constraint_: Constraint.t) =>

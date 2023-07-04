@@ -10,17 +10,6 @@ module MakeSync = (SyncAdapter: SyncAdapter) => {
   module GroupBy = QueryBuilder_GroupBy
   module OrderBy = QueryBuilder_OrderBy
 
-  module CreateTable = {
-    include QueryBuilder_CreateTable
-    include SQLBuilder_CreateTable
-
-    let execute = (query, connection) => {
-      let sql = toSQL(query)
-
-      SyncAdapter.execute(connection, sql)
-    }
-  }
-
   module InsertInto = {
     include QueryBuilder_InsertInto
     include SQLBuilder_InsertInto
