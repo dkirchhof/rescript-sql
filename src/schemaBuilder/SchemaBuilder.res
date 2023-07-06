@@ -1,105 +1,51 @@
-type column = {
-  type_: Column.columnType,
-  size?: int,
-  notNull?: bool,
-  autoIncrement?: bool,
-  skipInInsertQuery?: bool,
-}
+open SchemaBuilder_Types
 
-external column: column => column = "%identity"
+type process = {argv: array<string>}
 
-type columnWithName = {
-  ...column,
-  name: string,
-}
+@val external process: process = "process"
 
-type table<'columns, 'constraints> = {
-  moduleName: string,
-  tableName: string,
-  columns: {..} as 'columns,
-  constraints: 'columns => ({..} as 'constraints),
-}
+external column: column => columnWithName = "%identity"
 
 let table = options => {
-  ...options,
-  columns: options.columns
-  ->Obj.magic
-  ->Dict.toArray
-  ->Array.map(((columnName, columnConfig)) => (columnName, {...columnConfig, name: columnName}))
-  ->Dict.fromArray
-  ->Obj.magic,
+  let table = {
+    ...options,
+    columns: options.columns
+    ->Obj.magic
+    ->Dict.toArray
+    ->Array.map(((columnName, columnConfig)) => (columnName, {...columnConfig, name: columnName}))
+    ->Dict.fromArray
+    ->Obj.magic,
+  }
+
+  switch Array.get(process.argv, 2) {
+    | Some("generate:res") => table->SchemaBuilder_SQL.toSQL->Console.log
+    | Some("generate:sql") => table->SchemaBuilder_SQL.toSQL->Console.log
+    | _ => ()
+  }
+
+  table
 }
 
-type fkConstraint = NoAction | SetNull | SetDefault | Cascade
-
-type t =
-  | Unique({columns: array<column>})
-  | PrimaryKey({columns: array<column>})
-  | ForeignKey({
-      columns: array<column>,
-      foreignTableName: string,
-      foreignColumns: array<column>,
-      onUpdate: fkConstraint,
-      onDelete: fkConstraint,
-    })
-
-type uniqueOptions = {columns: array<column>}
+type uniqueOptions = {columns: array<columnWithName>}
 
 let unique = (options: uniqueOptions) => Unique({columns: options.columns})
 
-type primaryKeyOptions = {columns: array<column>}
+type primaryKeyOptions = {columns: array<columnWithName>}
 
 let primaryKey = (options: primaryKeyOptions) => PrimaryKey({columns: options.columns})
 
 type foreignKeyOptions<'fcolumns, 'fconstraints> = {
-  columns: array<column>,
+  columns: array<columnWithName>,
   foreignTable: table<'fcolumns, 'fconstraints>,
-  foreignColumns: 'fcolumns => array<column>,
+  foreignColumns: 'fcolumns => array<columnWithName>,
   onUpdate: fkConstraint,
   onDelete: fkConstraint,
 }
 
 let foreignKey = (options: foreignKeyOptions<_>) => ForeignKey({
-  columns: options.columns,
+  columns: Obj.magic(options.columns),
   foreignTableName: options.foreignTable.tableName,
-  foreignColumns: options.foreignColumns(options.foreignTable.columns),
+  foreignColumns: Obj.magic(options.foreignColumns(options.foreignTable.columns)),
   onUpdate: options.onUpdate,
   onDelete: options.onDelete,
 })
-
-let artistsTable = table({
-  moduleName: "Artists",
-  tableName: "artists",
-  columns: {
-    "id": column({type_: INTEGER, skipInInsertQuery: true}),
-    "name": column({type_: TEXT, size: 100}),
-  },
-  constraints: c =>
-    {
-      "pk": primaryKey({columns: [c["id"]]}),
-      "unique": unique({columns: [c["name"]]}),
-    },
-})
-
-let songsTable = table({
-  moduleName: "Songs",
-  tableName: "songs",
-  columns: {
-    "id": column({type_: INTEGER, skipInInsertQuery: true}),
-    "artistId": column({type_: INTEGER}),
-    "name": column({type_: TEXT, size: 100}),
-  },
-  constraints: c =>
-    {
-      "pk": primaryKey({columns: [c["id"]]}),
-      "fkArtist": foreignKey({
-        columns: [c["artistId"]],
-        foreignTable: artistsTable,
-        foreignColumns: c2 => [c2["id"]],
-        onUpdate: NoAction,
-        onDelete: Cascade,
-      }),
-    },
-})
-
-Logger.log(songsTable)

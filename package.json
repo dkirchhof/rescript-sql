@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "rescript-sql": "./cli/index.mjs"
+  },
   "scripts": {
     "dev": "rescript build -w"
   },

@@ -24,7 +24,6 @@ module ArtistsTable = {
       "id": Node.Column({name: "id", type_: INTEGER, notNull: true}), 
       "name": Node.Column({name: "name", type_: TEXT, notNull: true}),
     }),
-    constraints: [PrimaryKey({name: "pk", columns: ["id"]}), Unique({name: "unique_name", columns: ["name"]})],
   }
 }
 
@@ -56,17 +55,6 @@ module SongsTable = {
       "artistId": Node.Column({name: "artistId", type_: INTEGER, notNull: true}),
       "name": Node.Column({name: "name", type_: TEXT, notNull: true}),
     }),
-    constraints: [
-      PrimaryKey({name: "pk", columns: ["id"]}),
-      ForeignKey({
-        name: "fkArtist",
-        columns: ["artistId"],
-        foreignTableName: "artists",
-        foreignColumns: ["id"],
-        onUpdate: NoAction,
-        onDelete: Cascade,
-      }),
-    ],
   }
 }
 

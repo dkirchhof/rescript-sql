@@ -1,6 +1,6 @@
 external columnTypeToSQL: Column.columnType => string = "%identity"
 
-let columnToSQL = (column: Column.t) => {
+let columnToSQL = (column: SchemaBuilder_Types.columnWithName) => {
   //     let sizeString = switch column.size {
   //     | Some(size) => `(${size->Belt.Int.toString})`
   //     | None => ""
@@ -8,7 +8,10 @@ let columnToSQL = (column: Column.t) => {
 
   let type_ = columnTypeToSQL(column.type_)
 
-  let notNull = column.notNull ? " NOT NULL" : ""
+  let notNull = switch column.notNull {
+  | Some(false) => " "
+  | _ => " NOT NULL"
+  }
 
   let autoIncrement = switch column.autoIncrement {
   | Some(true) => " AUTOINCREMENT"
@@ -18,39 +21,46 @@ let columnToSQL = (column: Column.t) => {
   `${column.name} ${type_}${notNull}${autoIncrement}`
 }
 
-let constraintToSQL = (constraint_: Constraint.t) =>
+let constraintToSQL = (name: string, constraint_: SchemaBuilder_Types.tableConstraint) =>
   switch constraint_ {
-  | Unique(unique) => `CONSTRAINT ${unique.name} UNIQUE (${Array.joinWith(unique.columns, ", ")})`
-  | PrimaryKey(primaryKey) => {
-      let columns = Array.joinWith(primaryKey.columns, ", ")
+  | Unique(unique) => {
+      let columns = unique.columns->Array.map(column => column.name)->Array.joinWith(", ")
 
-      `CONSTRAINT ${primaryKey.name} PRIMARY KEY (${columns})`
+      `CONSTRAINT ${name} UNIQUE (${columns})`
+    }
+  | PrimaryKey(primaryKey) => {
+      let columns = primaryKey.columns->Array.map(column => column.name)->Array.joinWith(", ")
+
+      `CONSTRAINT ${name} PRIMARY KEY (${columns})`
     }
   | ForeignKey(foreignKey) => {
-      let columns = Array.joinWith(foreignKey.columns, ", ")
-      let fcolumns = Array.joinWith(foreignKey.foreignColumns, ", ")
+      let columns = foreignKey.columns->Array.map(column => column.name)->Array.joinWith(", ")
 
-      `CONSTRAINT ${foreignKey.name} FOREIGN KEY (${columns}) REFERENCES ${foreignKey.foreignTableName} (${fcolumns})`
+      let fcolumns =
+        foreignKey.foreignColumns->Array.map(column => column.name)->Array.joinWith(", ")
+
+      `CONSTRAINT ${name} FOREIGN KEY (${columns}) REFERENCES ${foreignKey.foreignTableName} (${fcolumns})`
     }
   }
 
-let toSQL = (q: QueryBuilder_CreateTable.t<_>) => {
+let toSQL = (schema: SchemaBuilder_Types.table<_>) => {
   open StringBuilder
 
-  let columns =
-    q.columns
-    ->Obj.magic
-    ->Dict.valuesToArray
-    ->Array.map(node => {
-      switch node {
-      | Node.Column(column) => columnToSQL(column)
-      | _ => panic("only available for columns")
-      }
-    })
+  let columns = schema.columns->Obj.magic->Dict.valuesToArray->Array.map(columnToSQL)
 
-  let constraints = q.constraints->Array.map(constraintToSQL)
+  let constraints =
+    schema.columns
+    ->schema.constraints
+    ->Obj.magic
+    ->Dict.toArray
+    ->Array.map(((name, options)) => constraintToSQL(name, options))
 
   let body = make()->addM(2, columns)->addM(2, constraints)->build(",\n")
 
-  make()->addS(0, `CREATE TABLE ${q.tableName} (`)->addS(0, body)->addS(0, `)`)->build("\n")
+  make()
+  ->addS(0, `CREATE TABLE ${schema.tableName} (`)
+  ->addS(0, body)
+  ->addS(0, `);`)
+  ->addS(0, "")
+  ->build("\n")
 }
