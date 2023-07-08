@@ -36,25 +36,14 @@ let makeTable = (schema: SchemaBuilder_Types.table<_>) => {
   open StringBuilder
 
   let columns = mapColumns(schema.columns, column => {
-    let fields =
-      make()
-      ->addS(8, `name: "${column.name}",`)
-      ->addS(8, `type_: "${(column.dbType)}",`)
-      ->addS(8, `notNull: ${notNullToString(column.notNull)},`)
-      ->build("\n")
-
-      make()
-      ->addS(6, `"${column.name}": Node.Column({`)
-      ->addS(0, fields)
-      ->addS(6, `}),`)
-      ->build("\n")
+    `"${column.name}": Node.Column({name: "${column.name}"}),`
   })
 
   make()
   ->addS(2, `let table: t = {`)
   ->addS(4, `name: "${schema.tableName}",`)
   ->addS(4, `columns: Obj.magic({`)
-  ->addM(0, columns)
+  ->addM(6, columns)
   ->addS(4, `}),`)
   ->addS(2, `}`)
   ->build("\n")
