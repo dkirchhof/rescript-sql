@@ -1,12 +1,8 @@
-external columnTypeToSQL: Column.columnType => string = "%identity"
-
 let columnToSQL = (column: SchemaBuilder_Types.columnWithName) => {
   //     let sizeString = switch column.size {
   //     | Some(size) => `(${size->Belt.Int.toString})`
   //     | None => ""
   //     }
-
-  let type_ = columnTypeToSQL(column.type_)
 
   let notNull = switch column.notNull {
   | Some(false) => " "
@@ -18,7 +14,7 @@ let columnToSQL = (column: SchemaBuilder_Types.columnWithName) => {
   | _ => ""
   }
 
-  `${column.name} ${type_}${notNull}${autoIncrement}`
+  `${column.name} ${column.type_ :> string}${notNull}${autoIncrement}`
 }
 
 let constraintToSQL = (name: string, constraint_: SchemaBuilder_Types.tableConstraint) =>

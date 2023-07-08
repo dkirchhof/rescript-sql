@@ -7,14 +7,17 @@
     "rescript-sql": "./cli/index.mjs"
   },
   "scripts": {
-    "dev": "rescript build -w"
+    "dev": "rescript build -w",
+    "start-example": "node example/Example.bs.mjs",
+    "generate-sql": "cli/index.mjs example/Schema_.bs.mjs example/Schema.sql",
+    "generate-res": "cli/index.mjs example/Schema_.bs.mjs example/Schema.res"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "better-sqlite3": "^8.4.0",
-    "rescript": "11.0.0-beta.1"
+    "rescript": "11.0.0-beta.3"
   },
   "dependencies": {
     "@rescript/core": "^0.3.1"

@@ -35,14 +35,12 @@ let fromToSQL = (source: QueryBuilder_Source.t) => {
   }
 }
 
-external joinTypeToString: QueryBuilder_Join.joinType => string = "%identity"
-
 let joinsToSQL = (joins: array<QueryBuilder_Join.t>) => {
   joins->Array.map(join => {
     open StringBuilder
 
     make()
-    ->addS(0, joinTypeToString(join.joinType))
+    ->addS(0, join.joinType :> string)
     ->addS(0, "JOIN")
     ->addS(0, join.table.name)
     ->addSO(0, join.table.alias->Option.map(alias => `AS ${alias}`))
@@ -71,8 +69,6 @@ let havingToSQL = having => {
   having->Option.map(expr => `HAVING ${SQLBuilder_Expr.toSQL(expr)}`)
 }
 
-external directionToString: QueryBuilder_OrderBy.direction => string = "%identity"
-
 let orderByToSQL = (orderBys: array<QueryBuilder_OrderBy.t>) => {
   switch orderBys {
   | [] => None
@@ -81,7 +77,7 @@ let orderByToSQL = (orderBys: array<QueryBuilder_OrderBy.t>) => {
         orderBys
         ->Array.map(orderBy => {
           let node = SQLBuilder_Unknown.toSQL(orderBy.node)
-          let direction = directionToString(orderBy.direction)
+          let direction = orderBy.direction :> string
 
           `${node} ${direction}`
         })

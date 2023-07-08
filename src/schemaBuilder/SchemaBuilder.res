@@ -18,7 +18,7 @@ let table = options => {
   }
 
   switch Array.get(process.argv, 2) {
-    | Some("generate:res") => table->SchemaBuilder_SQL.toSQL->Console.log
+    | Some("generate:res") => table->SchemaBuilder_Res.toRescript->Console.log
     | Some("generate:sql") => table->SchemaBuilder_SQL.toSQL->Console.log
     | _ => ()
   }

@@ -1,65 +1,3 @@
-/* start of generated code */
-
-module ArtistsTable = {
-  type select = {
-    id: int,
-    name: string,
-  }
-
-  type insert = {
-    id?: int,
-    name: string,
-  }
-
-  type update = {
-    id?: int,
-    name?: string,
-  }
-
-  type t = Table.t<select, insert, update>
-
-  let table: t = {
-    name: "artists",
-    columns: Obj.magic({
-      "id": Node.Column({name: "id", type_: INTEGER, notNull: true}), 
-      "name": Node.Column({name: "name", type_: TEXT, notNull: true}),
-    }),
-  }
-}
-
-module SongsTable = {
-  type select = {
-    id: int,
-    artistId: int,
-    name: string,
-  }
-
-  type insert = {
-    id?: int,
-    artistId: int,
-    name: string,
-  }
-
-  type update = {
-    id?: int,
-    artistId?: int,
-    name?: string,
-  }
-
-  type t = Table.t<select, insert, update>
-
-  let table: t = {
-    name: "songs",
-    columns: Obj.magic({
-      "id": Node.Column({name: "id", type_: INTEGER, notNull: true}),
-      "artistId": Node.Column({name: "artistId", type_: INTEGER, notNull: true}),
-      "name": Node.Column({name: "name", type_: TEXT, notNull: true}),
-    }),
-  }
-}
-
-/* end of generated code */
-
 module DB = RescriptSQL.MakeSync({
   type connection = BetterSQLite3.connection
 
@@ -77,11 +15,11 @@ let insertExample = () => {
     query->execute(connection)->Logger.log
   }
 
-  insertInto(ArtistsTable.table)
+  insertInto(Schema.Artists.table)
   ->values([{name: "Artist 1"}, {name: "Artist 2"}, {name: "Artist 3"}])
   ->logAndExecute
 
-  insertInto(SongsTable.table)
+  insertInto(Schema.Songs.table)
   ->values([
     {id: 11, artistId: 1, name: "Song 1_1"},
     {id: 12, artistId: 1, name: "Song 1_2"},
@@ -95,7 +33,7 @@ let crudExample = () => {
   let create = () => {
     open DB.InsertInto
 
-    let query = insertInto(ArtistsTable.table)->values([{id: 100, name: "DELETEME"}])
+    let query = insertInto(Schema.Artists.table)->values([{id: 100, name: "DELETEME"}])
 
     query->toSQL->Logger.log
     query->execute(connection)->Logger.log
@@ -104,7 +42,7 @@ let crudExample = () => {
   let read = () => {
     open DB.Select
 
-    let query = from(ArtistsTable.table)->selectAll
+    let query = from(Schema.Artists.table)->selectAll
 
     query->toSQL->Logger.log
     query->execute(connection)->Logger.log
@@ -114,7 +52,7 @@ let crudExample = () => {
     open DB.Update
     open DB.Expr
 
-    let query = update(ArtistsTable.table)->set({name: "DELETEME!!!"})->where(c => eq(c.id, 100))
+    let query = update(Schema.Artists.table)->set({name: "DELETEME!!!"})->where(c => eq(c.id, 100))
 
     query->toSQL->Logger.log
     query->execute(connection)->Logger.log
@@ -124,7 +62,7 @@ let crudExample = () => {
     open DB.DeleteFrom
     open DB.Expr
 
-    let query = deleteFrom(ArtistsTable.table)->where(c => eq(c.id, 100))
+    let query = deleteFrom(Schema.Artists.table)->where(c => eq(c.id, 100))
 
     query->toSQL->Logger.log
     query->execute(connection)->Logger.log
@@ -150,9 +88,9 @@ let dql = () => {
     query->execute(connection)->Logger.log
   }
 
-  from(ArtistsTable.table)->selectAll->logAndExecute
+  from(Schema.Artists.table)->selectAll->logAndExecute
 
-  from(ArtistsTable.table)
+  from(Schema.Artists.table)
   ->where(c => eq(c.id, 1))
   ->select(c =>
     {
@@ -164,41 +102,41 @@ let dql = () => {
   )
   ->logAndExecute
 
-  from(ArtistsTable.table)
+  from(Schema.Artists.table)
   ->select(c => {"a": {"c": c.name, "d": 1, "e": {"someBoolean": true}}})
   ->logAndExecute
 
-  from(ArtistsTable.table)
-  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  from(Schema.Artists.table)
+  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
   ->selectAll
   ->logAndExecute
 
-  from(ArtistsTable.table)
-  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  from(Schema.Artists.table)
+  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
   ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
   ->logAndExecute
 
-  from(ArtistsTable.table)
-  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  from(Schema.Artists.table)
+  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
   ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
   ->logAndExecute
 
-  from(ArtistsTable.table)
-  ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  from(Schema.Artists.table)
+  ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
   ->selectAll
   ->logAndExecute
 
-  from(ArtistsTable.table)
-  ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  from(Schema.Artists.table)
+  ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
   ->select(c => {"artistName": c.t1.name, "songName": Option.map(c.t2, t2 => t2.name)})
   ->logAndExecute
 
-  from(ArtistsTable.table)
-  ->leftJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  from(Schema.Artists.table)
+  ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
   ->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
   ->logAndExecute
 
-  from(ArtistsTable.table)
+  from(Schema.Artists.table)
   ->where(c => eq(c.id, 1))
   ->groupBy(c => [group(c.id), group(c.name)])
   ->having(c => eq(c.id, 1))
@@ -208,8 +146,8 @@ let dql = () => {
   ->selectAll
   ->logAndExecute
 
-  from(ArtistsTable.table)
-  ->innerJoin1(SongsTable.table, c => eq(c.t2.artistId, c.t1.id))
+  from(Schema.Artists.table)
+  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
   ->where(c => eq(c.t1.id, 1))
   ->groupBy(c => [group(c.t1.id), group(c.t2.name)])
   ->having(c => eq(c.t1.id, 1))
@@ -219,8 +157,8 @@ let dql = () => {
   ->selectAll
   ->logAndExecute
 
-  // from(ArtistsTable.table)
-  // ->S1.where(c => eq(c.id, from(ArtistsTable.table)->S1.toSubquery(c => c.id)))
+  // from(Schema.Artists.table)
+  // ->S1.where(c => eq(c.id, from(Schema.Artists.table)->S1.toSubquery(c => c.id)))
   // ->S1.select(c =>
   //   {
   //     "id": c.id,
