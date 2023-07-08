@@ -1,16 +1,22 @@
-type column = {
-  dbType: string,
-  resType: string,
+type baseColumn = {
   size?: int,
   notNull?: bool,
   autoIncrement?: bool,
   skipInInsertQuery?: bool,
 }
 
-type columnWithName = {
-  ...column,
+type baseColumnWithTypes = {
+  ...baseColumn,
+  dbType: string,
+  resType: string,
+}
+
+type column = {
+  ...baseColumnWithTypes,
   name: string,
 }
+
+type columnWithName = column
 
 type fkConstraint = NoAction | SetNull | SetDefault | Cascade
 

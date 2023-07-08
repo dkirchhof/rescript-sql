@@ -4,7 +4,21 @@ type process = {argv: array<string>}
 
 @val external process: process = "process"
 
-external column: column => columnWithName = "%identity"
+module C = {
+  let integer = (options: baseColumn): column => {
+    ...Obj.magic(options),
+    dbType: "INTEGER",
+    resType: "int",
+  }
+
+  let text = (options: baseColumn): column => {
+    ...Obj.magic(options),
+    dbType: "TEXT",
+    resType: "string",
+  }
+
+  external custom: baseColumnWithTypes => column = "%identity"
+}
 
 let table = options => {
   let table = {
