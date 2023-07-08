@@ -1,9 +1,3 @@
-let dbTypeToResType = (dbType: Column.columnType) =>
-  switch dbType {
-  | INTEGER => "int"
-  | TEXT => "string"
-  }
-
 let mapColumns = (columns, fn: SchemaBuilder_Types.columnWithName => string) => {
   columns->Obj.magic->Dict.valuesToArray->Array.map(fn)
 }
@@ -26,9 +20,9 @@ let makeType = (name, columns) => {
 
   let fields = mapColumns(columns, column => {
     switch name {
-    | "columns" => `${column.name}: ${dbTypeToResType(column.type_)},`
-    | "insert" => `${column.name}${skipToString(column)}: ${dbTypeToResType(column.type_)},`
-    | "update" => `${column.name}?: ${dbTypeToResType(column.type_)},`
+    | "columns" => `${column.name}: ${column.resType},`
+    | "insert" => `${column.name}${skipToString(column)}: ${column.resType},`
+    | "update" => `${column.name}?: ${column.resType},`
     | _ => panic("unhandled type name")
     }
   })
@@ -45,7 +39,7 @@ let makeTable = (schema: SchemaBuilder_Types.table<_>) => {
     let fields =
       make()
       ->addS(8, `name: "${column.name}",`)
-      ->addS(8, `type_: ${(column.type_ :> string)},`)
+      ->addS(8, `type_: "${(column.dbType)}",`)
       ->addS(8, `notNull: ${notNullToString(column.notNull)},`)
       ->build("\n")
 

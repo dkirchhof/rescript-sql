@@ -1,8 +1,8 @@
 let columnToSQL = (column: SchemaBuilder_Types.columnWithName) => {
-  //     let sizeString = switch column.size {
-  //     | Some(size) => `(${size->Belt.Int.toString})`
-  //     | None => ""
-  //     }
+  let sizeString = switch column.size {
+  | Some(size) => `(${size->Belt.Int.toString})`
+  | None => ""
+  }
 
   let notNull = switch column.notNull {
   | Some(false) => " "
@@ -14,7 +14,7 @@ let columnToSQL = (column: SchemaBuilder_Types.columnWithName) => {
   | _ => ""
   }
 
-  `${column.name} ${column.type_ :> string}${notNull}${autoIncrement}`
+  `${column.name} ${column.dbType}${sizeString}${notNull}${autoIncrement}`
 }
 
 let constraintToSQL = (name: string, constraint_: SchemaBuilder_Types.tableConstraint) =>

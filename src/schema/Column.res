@@ -1,8 +1,6 @@
-type columnType = INTEGER | TEXT
-
 type t = {
   name: string,
-  type_: columnType,
+  type_: string,
   notNull: bool,
   autoIncrement?: bool,
   tableAlias?: string,

@@ -1,5 +1,6 @@
 type column = {
-  type_: Column.columnType,
+  dbType: string,
+  resType: string,
   size?: int,
   notNull?: bool,
   autoIncrement?: bool,

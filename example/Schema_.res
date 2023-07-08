@@ -4,8 +4,8 @@ let artistsTable = table({
   moduleName: "Artists",
   tableName: "artists",
   columns: {
-    "id": column({type_: INTEGER, skipInInsertQuery: true}),
-    "name": column({type_: TEXT, size: 100}),
+    "id": column({dbType: "INTEGER", resType: "int", skipInInsertQuery: true}),
+    "name": column({dbType: "TEXT", resType: "string", size: 100}),
   },
   constraints: c =>
     {
@@ -18,9 +18,9 @@ let songsTable = table({
   moduleName: "Songs",
   tableName: "songs",
   columns: {
-    "id": column({type_: INTEGER, skipInInsertQuery: true}),
-    "artistId": column({type_: INTEGER}),
-    "name": column({type_: TEXT, size: 100}),
+    "id": column({dbType: "INTEGER", resType: "int", skipInInsertQuery: true}),
+    "artistId": column({dbType: "INTEGER", resType: "int"}),
+    "name": column({dbType: "TEXT", resType: "string", size: 100}),
   },
   constraints: c =>
     {
