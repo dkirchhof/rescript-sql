@@ -4,21 +4,19 @@ type process = {argv: array<string>}
 
 @val external process: process = "process"
 
-module C = {
-  let integer = (options: baseColumn): column => {
-    ...Obj.magic(options),
-    dbType: "INTEGER",
-    resType: "int",
-  }
-
-  let text = (options: baseColumn): column => {
-    ...Obj.magic(options),
-    dbType: "TEXT",
-    resType: "string",
-  }
-
-  external custom: baseColumnWithTypes => column = "%identity"
+let integerColumn = (options: baseColumn): column => {
+  ...Obj.magic(options),
+  dbType: "INTEGER",
+  resType: "int",
 }
+
+let textColumn = (options: baseColumn): column => {
+  ...Obj.magic(options),
+  dbType: "TEXT",
+  resType: "string",
+}
+
+external customColumn: baseColumnWithTypes => column = "%identity"
 
 let table = options => {
   let table = {
@@ -31,10 +29,10 @@ let table = options => {
     ->Obj.magic,
   }
 
-  switch Array.get(process.argv, 2) {
-    | Some("generate:res") => table->SchemaBuilder_Res.toRescript->Console.log
-    | Some("generate:sql") => table->SchemaBuilder_SQL.toSQL->Console.log
-    | _ => ()
+  switch process.argv[2] {
+  | Some("generate:res") => table->SchemaBuilder_Res.toRescript->Console.log
+  | Some("generate:sql") => table->SchemaBuilder_SQL.toSQL->Console.log
+  | _ => ()
   }
 
   table

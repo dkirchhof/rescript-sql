@@ -4,8 +4,8 @@ let artistsTable = table({
   moduleName: "Artists",
   tableName: "artists",
   columns: {
-    "id": C.integer({skipInInsertQuery: true}),
-    "name": C.text({size: 100}),
+    "id": integerColumn({skipInInsertQuery: true}),
+    "name": textColumn({size: 100}),
   },
   constraints: c =>
     {
@@ -18,9 +18,9 @@ let songsTable = table({
   moduleName: "Songs",
   tableName: "songs",
   columns: {
-    "id": C.integer({skipInInsertQuery: true}),
-    "artistId": C.integer({}),
-    "name": C.text({size: 100}),
+    "id": integerColumn({skipInInsertQuery: true}),
+    "artistId": integerColumn({}),
+    "name": textColumn({size: 100}),
   },
   constraints: c =>
     {
