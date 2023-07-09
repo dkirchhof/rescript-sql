@@ -6,6 +6,7 @@ let artistsTable = table({
   columns: {
     "id": integerColumn({skipInInsertQuery: true}),
     "name": textColumn({size: 100}),
+    "genre": textColumn({size: 100, nullable: true}),
   },
   constraints: c =>
     {

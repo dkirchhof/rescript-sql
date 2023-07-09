@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "rescript build -w",
-    "start-example": "node example/Example.bs.mjs",
+    "start-example": "rm -f example/db.db && sqlite3 example/db.db < example/Schema.sql && node example/Example.bs.mjs",
     "generate-sql": "cli/index.mjs example/Schema_.bs.mjs example/Schema.sql",
     "generate-res": "cli/index.mjs example/Schema_.bs.mjs example/Schema.res"
   },

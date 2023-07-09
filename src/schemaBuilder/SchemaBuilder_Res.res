@@ -9,20 +9,19 @@ let skipToString = (column: SchemaBuilder_Types.columnWithName) => {
   }
 }
 
-let notNullToString = notNull =>
-  switch notNull {
-  | Some(false) => "false"
-  | _ => "true"
-  }
-
 let makeType = (name, columns) => {
   open StringBuilder
 
   let fields = mapColumns(columns, column => {
+    let resType = switch column.nullable {
+      | Some(true) => `NULL.t<${column.resType}>`
+      | _ => column.resType
+    }
+
     switch name {
-    | "columns" => `${column.name}: ${column.resType},`
-    | "insert" => `${column.name}${skipToString(column)}: ${column.resType},`
-    | "update" => `${column.name}?: ${column.resType},`
+    | "columns" => `${column.name}: ${resType},`
+    | "insert" => `${column.name}${skipToString(column)}: ${resType},`
+    | "update" => `${column.name}?: ${resType},`
     | _ => panic("unhandled type name")
     }
   })

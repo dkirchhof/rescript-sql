@@ -2,3 +2,7 @@ lib/
 node_modules/
 
 *.bs.mjs
+
+example/db.db
+example/Schema.res
+example/Schema.sql

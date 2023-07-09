@@ -5,7 +5,7 @@ module DB = RescriptSQL.MakeSync({
   let getRows = (connection, sql) => BetterSQLite3.prepare(connection, sql)->BetterSQLite3.all
 })
 
-let connection = BetterSQLite3.createConnection(":memory:")
+let connection = BetterSQLite3.createConnection("example/db.db")
 
 let insertExample = () => {
   open DB.InsertInto
@@ -16,7 +16,11 @@ let insertExample = () => {
   }
 
   insertInto(Schema.Artists.table)
-  ->values([{name: "Artist 1"}, {name: "Artist 2"}, {name: "Artist 3"}])
+  ->values([
+    {name: "Artist 1", genre: Value("Rock")},
+    {name: "Artist 2", genre: Null},
+    {name: "Artist 3", genre: Null},
+  ])
   ->logAndExecute
 
   insertInto(Schema.Songs.table)
@@ -33,7 +37,7 @@ let crudExample = () => {
   let create = () => {
     open DB.InsertInto
 
-    let query = insertInto(Schema.Artists.table)->values([{id: 100, name: "DELETEME"}])
+    let query = insertInto(Schema.Artists.table)->values([{id: 100, name: "DELETEME", genre: Null}])
 
     query->toSQL->Logger.log
     query->execute(connection)->Logger.log
@@ -66,7 +70,6 @@ let crudExample = () => {
 
     query->toSQL->Logger.log
     query->execute(connection)->Logger.log
-
   }
 
   create()

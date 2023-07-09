@@ -1,6 +1,6 @@
 type baseColumn = {
   size?: int,
-  notNull?: bool,
+  nullable?: bool,
   autoIncrement?: bool,
   skipInInsertQuery?: bool,
 }

@@ -4,8 +4,8 @@ let columnToSQL = (column: SchemaBuilder_Types.columnWithName) => {
   | None => ""
   }
 
-  let notNull = switch column.notNull {
-  | Some(false) => " "
+  let notNull = switch column.nullable {
+  | Some(true) => ""
   | _ => " NOT NULL"
   }
 
