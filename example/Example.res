@@ -85,6 +85,7 @@ let dql = () => {
   open DB.Expr
   open DB.GroupBy
   open DB.OrderBy
+  open! DB.Agg
 
   let logAndExecute = query => {
     query->toSQL->Logger.log
@@ -108,6 +109,12 @@ let dql = () => {
   from(Schema.Artists.table)
   ->select(c => {"a": {"c": c.name, "d": 1, "e": {"someBoolean": true}}})
   ->logAndExecute
+
+  from(Schema.Artists.table)->select(c => {"count": count(c.id)})->logAndExecute
+  from(Schema.Artists.table)->select(c => {"sum": sum(c.id)})->logAndExecute
+  from(Schema.Artists.table)->select(c => {"avg": avg(c.id)})->logAndExecute
+  from(Schema.Artists.table)->select(c => {"min": min(c.id)})->logAndExecute
+  from(Schema.Artists.table)->select(c => {"max": max(c.id)})->logAndExecute
 
   from(Schema.Artists.table)
   ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))

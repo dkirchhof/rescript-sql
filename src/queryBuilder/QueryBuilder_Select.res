@@ -174,7 +174,7 @@ let selectAll = q => {
   projection: q._projectables->QueryBuilder_Utils.ensureNodes,
 }
 
-let select = (q, getProjection) => {
+let select = (q, getProjection: 'a => {..}) => {
   QueryBuilder_Select_Executable.from: q.from,
   joins: q.joins,
   where: q.where,
