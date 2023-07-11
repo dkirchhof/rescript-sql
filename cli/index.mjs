@@ -46,6 +46,8 @@ function generateSchemaRes() {
   const command = `node ${schemaFile} generate:res >> ${resultFile}`;
 
   console.log(command)
+
+  execSync(`echo "open RescriptSQL\n" >> ${resultFile}`)
   execSync(command);
 }
 
