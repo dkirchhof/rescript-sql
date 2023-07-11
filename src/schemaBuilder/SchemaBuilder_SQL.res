@@ -44,14 +44,15 @@ let toSQL = (schema: SchemaBuilder_Types.table<_>) => {
 
   let columns = schema.columns->Obj.magic->Dict.valuesToArray->Array.map(columnToSQL)
 
-  let constraints =
+  let constraints = Option.map(schema.constraints, constraints => {
     schema.columns
-    ->schema.constraints
+    ->constraints
     ->Obj.magic
     ->Dict.toArray
     ->Array.map(((name, options)) => constraintToSQL(name, options))
+  })
 
-  let body = make()->addM(2, columns)->addM(2, constraints)->build(",\n")
+  let body = make()->addM(2, columns)->addMO(2, constraints)->build(",\n")
 
   make()
   ->addS(0, `CREATE TABLE ${schema.tableName} (`)

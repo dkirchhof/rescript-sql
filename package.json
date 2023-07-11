@@ -1,5 +1,5 @@
 {
-  "name": "rescript-sql-2",
+  "name": "rescript-sql",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -20,7 +20,7 @@
     "rescript": "11.0.0-beta.3"
   },
   "dependencies": {
-    "@rescript/core": "^0.3.1"
+    "@rescript/core": "^0.4.0"
   },
   "peerDependencies": {
     "better-sqlite3": "^8.4.0"

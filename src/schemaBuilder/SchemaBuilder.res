@@ -38,6 +38,8 @@ let table = options => {
   table
 }
 
+let tableWithoutConstraints: table<'columns, _> => table<'columns, {.}> = table
+
 type uniqueOptions = {columns: array<columnWithName>}
 
 let unique = (options: uniqueOptions) => Unique({columns: options.columns})

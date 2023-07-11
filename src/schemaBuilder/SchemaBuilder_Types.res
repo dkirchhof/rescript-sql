@@ -35,5 +35,5 @@ type table<'columns, 'constraints> = {
   moduleName: string,
   tableName: string,
   columns: {..} as 'columns,
-  constraints: 'columns => ({..} as 'constraints),
+  constraints?: 'columns => ({..} as 'constraints),
 }
