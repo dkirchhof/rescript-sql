@@ -1,7 +1,9 @@
 lib/
 node_modules/
 
-*.bs.mjs
+*.mjs
+
+!cli/index.mjs
 
 example/db.db
 example/Schema.res

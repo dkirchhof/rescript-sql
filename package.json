@@ -8,9 +8,9 @@
   },
   "scripts": {
     "dev": "rescript build -w",
-    "start-example": "rm -f example/db.db && sqlite3 example/db.db < example/Schema.sql && node example/Example.bs.mjs",
-    "generate-sql": "cli/index.mjs example/Schema_.bs.mjs example/Schema.sql",
-    "generate-res": "cli/index.mjs example/Schema_.bs.mjs example/Schema.res"
+    "start-example": "rm -f example/db.db && sqlite3 example/db.db < example/Schema.sql && node example/Example.mjs",
+    "generate-sql": "cli/index.mjs example/Schema_.mjs example/Schema.sql",
+    "generate-res": "cli/index.mjs example/Schema_.mjs example/Schema.res"
   },
   "keywords": [],
   "author": "",
