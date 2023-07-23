@@ -1,6 +1,6 @@
 type rec t =
-  // | And(array<t>)
-  // | Or(array<t>)
+  | And(array<t>)
+  | Or(array<t>)
   | Equal(Unknown.t, Unknown.t)
   | NotEqual(Unknown.t, Unknown.t)
   | GreaterThan(Unknown.t, Unknown.t)
@@ -16,6 +16,8 @@ type rec t =
   | ILike(Unknown.t, string)
   | NotILike(Unknown.t, string)
 
+let and_ = expressions => And(expressions)
+let or_ = expressions => Or(expressions)
 let eq = (left: 't, right: 't) => Equal(Unknown.make(left), Unknown.make(right))
 let ne = (left: 't, right: 't) => NotEqual(Unknown.make(left), Unknown.make(right))
 let gt = (left: 't, right: 't) => GreaterThan(Unknown.make(left), Unknown.make(right))

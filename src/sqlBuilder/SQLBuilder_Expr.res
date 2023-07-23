@@ -26,8 +26,15 @@ let likeExprToSQL = (left, right, operator) => {
   `${left} ${operator} ${right}`
 }
 
-let toSQL = (expr: QueryBuilder_Expr.t) => {
+let rec group = (expr, operator) => {
+  let array = expr->Array.map(toSQL)->Array.joinWith(` ${operator} `)
+
+  `(${array})`
+}
+and toSQL = (expr: QueryBuilder_Expr.t) => {
   switch expr {
+  | And(expressions) => group(expressions, "AND")
+  | Or(expressions) => group(expressions, "OR")
   | Equal(left, right) => simpleExprToSQL(left, right, "=")
   | NotEqual(left, right) => simpleExprToSQL(left, right, "!=")
   | GreaterThan(left, right) => simpleExprToSQL(left, right, ">")
