@@ -1,8 +1,11 @@
-module DB = RescriptSQL.MakeSync({
+module DB = RescriptSQL.Make({
   type connection = BetterSQLite3.connection
+  type error = string
 
-  let execute = BetterSQLite3.exec
-  let getRows = (connection, sql) => BetterSQLite3.prepare(connection, sql)->BetterSQLite3.all
+  let execute = (connection, sql) => BetterSQLite3.exec(connection, sql)->AsyncResult.ok
+
+  let getRows = (connection, sql) =>
+    BetterSQLite3.prepare(connection, sql)->BetterSQLite3.all->AsyncResult.ok
 })
 
 let connection = BetterSQLite3.createConnection("example/db.db")
@@ -11,8 +14,12 @@ let insertExample = () => {
   open DB.InsertInto
 
   let logAndExecute = query => {
-    query->toSQL->Logger.log
-    query->execute(connection)->Logger.log
+    query
+    ->execute(connection)
+    ->AsyncResult.forEach(_result => {
+      query->toSQL->Logger.log
+      // result->Logger.log
+    })
   }
 
   insertInto(Schema.Artists.table)
@@ -39,8 +46,12 @@ let crudExample = () => {
 
     let query = insertInto(Schema.Artists.table)->values([{id: 100, name: "DELETEME", genre: Null}])
 
-    query->toSQL->Logger.log
-    query->execute(connection)->Logger.log
+    query
+    ->execute(connection)
+    ->AsyncResult.forEach(_result => {
+      query->toSQL->Logger.log
+      // result->Logger.log
+    })
   }
 
   let read = () => {
@@ -48,8 +59,12 @@ let crudExample = () => {
 
     let query = from(Schema.Artists.table)->selectAll
 
-    query->toSQL->Logger.log
-    query->execute(connection)->Logger.log
+    query
+    ->execute(connection)
+    ->AsyncResult.forEach(result => {
+      query->toSQL->Logger.log
+      result->Logger.log
+    })
   }
 
   let update = () => {
@@ -58,8 +73,12 @@ let crudExample = () => {
 
     let query = update(Schema.Artists.table)->set({name: "DELETEME!!!"})->where(c => eq(c.id, 100))
 
-    query->toSQL->Logger.log
-    query->execute(connection)->Logger.log
+    query
+    ->execute(connection)
+    ->AsyncResult.forEach(_result => {
+      query->toSQL->Logger.log
+      // result->Logger.log
+    })
   }
 
   let delete = () => {
@@ -68,8 +87,12 @@ let crudExample = () => {
 
     let query = deleteFrom(Schema.Artists.table)->where(c => eq(c.id, 100))
 
-    query->toSQL->Logger.log
-    query->execute(connection)->Logger.log
+    query
+    ->execute(connection)
+    ->AsyncResult.forEach(_result => {
+      query->toSQL->Logger.log
+      // result->Logger.log
+    })
   }
 
   create()
@@ -88,8 +111,12 @@ let dql = () => {
   open! DB.Agg
 
   let logAndExecute = query => {
-    query->toSQL->Logger.log
-    query->execute(connection)->Logger.log
+    query
+    ->execute(connection)
+    ->AsyncResult.forEach(result => {
+      query->toSQL->Logger.log
+      result->Logger.log
+    })
   }
 
   from(Schema.Artists.table)->selectAll->logAndExecute

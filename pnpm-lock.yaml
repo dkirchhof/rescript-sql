@@ -8,6 +8,9 @@ dependencies:
   '@rescript/core':
     specifier: ^0.4.0
     version: 0.4.0(rescript@11.0.0-beta.3)
+  rescript-async-result:
+    specifier: github:dkirchhof/rescript-async-result
+    version: github.com/dkirchhof/rescript-async-result/12773cfb530f0c222cf4ad8dea99189182a2fb8a
 
 devDependencies:
   better-sqlite3:
@@ -276,3 +279,9 @@ packages:
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: true
+
+  github.com/dkirchhof/rescript-async-result/12773cfb530f0c222cf4ad8dea99189182a2fb8a:
+    resolution: {tarball: https://codeload.github.com/dkirchhof/rescript-async-result/tar.gz/12773cfb530f0c222cf4ad8dea99189182a2fb8a}
+    name: rescript-async-result
+    version: 0.1.0
+    dev: false

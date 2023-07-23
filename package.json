@@ -20,7 +20,8 @@
     "rescript": "11.0.0-beta.3"
   },
   "dependencies": {
-    "@rescript/core": "^0.4.0"
+    "@rescript/core": "^0.4.0",
+    "rescript-async-result": "github:dkirchhof/rescript-async-result"
   },
   "peerDependencies": {
     "better-sqlite3": "^8.4.0"

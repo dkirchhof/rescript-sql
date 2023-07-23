@@ -19,7 +19,8 @@
     }
   ],
   "bs-dependencies": [
-    "@rescript/core"
+    "@rescript/core",
+    "rescript-async-result"
   ],
   "bsc-flags": [
     "-open RescriptCore"
