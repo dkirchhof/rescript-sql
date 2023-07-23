@@ -194,6 +194,17 @@ let dql = () => {
   ->selectAll
   ->logAndExecute
 
+  from(Schema.Artists.table)
+  ->where(c =>
+    and_([
+      ne(c.id, c.id),
+      between(c.id, 1, 2),
+      or_([inArray(c.id, [1, 2, 3]), like(c.name, "%test%")]),
+    ])
+  )
+  ->selectAll
+  ->logAndExecute
+
   // from(Schema.Artists.table)
   // ->S1.where(c => eq(c.id, from(Schema.Artists.table)->S1.toSubquery(c => c.id)))
   // ->S1.select(c =>

@@ -23,7 +23,7 @@ let inExprToSQL = (left, array, operator) => {
 let likeExprToSQL = (left, right, operator) => {
   let left = SQLBuilder_Unknown.toSQL(left)
 
-  `${left} ${operator} ${right}`
+  `${left} ${operator} '${right}'`
 }
 
 let rec group = (expr, operator) => {

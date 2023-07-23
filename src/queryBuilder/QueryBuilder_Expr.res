@@ -44,8 +44,8 @@ let notInArray = (left: 't, array: array<'t>) => NotIn(
   Array.map(array, Unknown.make),
 )
 
-let like = (left: 't, right: string) => Like(Unknown.make(left), right)
-let notLike = (left: 't, right: string) => NotLike(Unknown.make(left), right)
+let like = (left: string, right: string) => Like(Unknown.make(left), right)
+let notLike = (left: string, right: string) => NotLike(Unknown.make(left), right)
 
-let ilike = (left: 't, right: string) => ILike(Unknown.make(left), right)
-let notILike = (left: 't, right: string) => NotILike(Unknown.make(left), right)
+let ilike = (left: string, right: string) => ILike(Unknown.make(left), right)
+let notILike = (left: string, right: string) => NotILike(Unknown.make(left), right)
