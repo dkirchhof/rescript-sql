@@ -2,7 +2,7 @@ let whereToSQL = where => {
   where->Option.map(expr => `WHERE ${SQLBuilder_Expr.toSQL(expr)}`)
 }
 
-let toSQL = (q: QueryBuilder_DeleteFrom.t<_>) => {
+let toSQL = (q: QueryBuilder_Delete.t<_>) => {
   open StringBuilder
 
   make()

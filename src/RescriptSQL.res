@@ -16,8 +16,8 @@ module Make = (Adapter: Adapter) => {
   module Agg = QueryBuilder_Agg
 
   module InsertInto = {
-    include QueryBuilder_InsertInto
-    include SQLBuilder_InsertInto
+    include QueryBuilder_Insert
+    include SQLBuilder_Insert
 
     let execute = (query, connection) => {
       let sql = toSQL(query)
@@ -38,8 +38,8 @@ module Make = (Adapter: Adapter) => {
   }
 
   module DeleteFrom = {
-    include QueryBuilder_DeleteFrom
-    include SQLBuilder_DeleteFrom
+    include QueryBuilder_Delete
+    include SQLBuilder_Delete
 
     let execute = (query, connection) => {
       let sql = toSQL(query)

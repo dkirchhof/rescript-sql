@@ -1,4 +1,4 @@
-let toSQL = (q: QueryBuilder_InsertInto.tx<_>) => {
+let toSQL = (q: QueryBuilder_Insert.tx<_>) => {
   open StringBuilder
 
   let columns = q.values[0]->Option.getExn->Obj.magic->Dict.keysToArray->Array.joinWith(", ")
