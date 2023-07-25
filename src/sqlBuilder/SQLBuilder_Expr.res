@@ -1,37 +1,43 @@
-let simpleExprToSQL = (left, right, operator) => {
-  let left = SQLBuilder_Unknown.toSQL(left)
-  let right = SQLBuilder_Unknown.toSQL(right)
+let simpleExprToSQL = subqueryToSQL => (left, right, operator) => {
+  let left = SQLBuilder_Unknown.toSQL(left, subqueryToSQL)
+  let right = SQLBuilder_Unknown.toSQL(right, subqueryToSQL)
 
   `${left} ${operator} ${right}`
 }
 
-let betweenExprToSQL = (left, min, max, operator) => {
-  let left = SQLBuilder_Unknown.toSQL(left)
-  let min = SQLBuilder_Unknown.toSQL(min)
-  let max = SQLBuilder_Unknown.toSQL(max)
+let betweenExprToSQL = subqueryToSQL => (left, min, max, operator) => {
+  let left = SQLBuilder_Unknown.toSQL(left, subqueryToSQL)
+  let min = SQLBuilder_Unknown.toSQL(min, subqueryToSQL)
+  let max = SQLBuilder_Unknown.toSQL(max, subqueryToSQL)
 
   `${left} ${operator} ${min} AND ${max}`
 }
 
-let inExprToSQL = (left, array, operator) => {
-  let left = SQLBuilder_Unknown.toSQL(left)
-  let array = array->Array.map(SQLBuilder_Unknown.toSQL)->Array.joinWith(", ")
+let inExprToSQL = subqueryToSQL => (left, array, operator) => {
+  let left = SQLBuilder_Unknown.toSQL(left, subqueryToSQL)
+  let array = array->Array.map(SQLBuilder_Unknown.toSQL(_, subqueryToSQL))->Array.joinWith(", ")
 
   `${left} ${operator} (${array})`
 }
 
-let likeExprToSQL = (left, right, operator) => {
-  let left = SQLBuilder_Unknown.toSQL(left)
+let likeExprToSQL = subqueryToSQL => (left, right, operator) => {
+  let left = SQLBuilder_Unknown.toSQL(left, subqueryToSQL)
 
   `${left} ${operator} '${right}'`
 }
 
-let rec group = (expr, operator) => {
-  let array = expr->Array.map(toSQL)->Array.joinWith(` ${operator} `)
+let rec group = subqueryToSQL => (expr, operator) => {
+  let array = expr->Array.map(toSQL(_, subqueryToSQL))->Array.joinWith(` ${operator} `)
 
   `(${array})`
 }
-and toSQL = (expr: QueryBuilder_Expr.t) => {
+and toSQL = (expr: QueryBuilder_Expr.t, subqueryToSQL) => {
+  let group = group(subqueryToSQL)
+  let simpleExprToSQL = simpleExprToSQL(subqueryToSQL)
+  let betweenExprToSQL = betweenExprToSQL(subqueryToSQL)
+  let inExprToSQL = inExprToSQL(subqueryToSQL)
+  let likeExprToSQL = likeExprToSQL(subqueryToSQL)
+
   switch expr {
   | And(expressions) => group(expressions, "AND")
   | Or(expressions) => group(expressions, "OR")

@@ -1,43 +1,3 @@
-// type singleColumnProjection<'a> = {value: 'a}
-
-//   let toSubquery = (q: t<'p1, _, 'p2, _>, getProjection: columns<'p1, 'p2> => 'p): 'p =>
-//     Node.makeSubquery({
-//       from: {name: q.from.name, alias: q.from.alias},
-//       joins: [
-//         {
-//           table: {
-//             name: q.join.table.name,
-//             alias: q.join.table.alias,
-//           },
-//           joinType: q.join.joinType,
-//           on: q.join.on,
-//         },
-//       ],
-//       where: q.where,
-//       limit: q.limit,
-//       offset: q.offset,
-//       projection: {
-//         value: {
-//           t1: Obj.magic(q.from.columns),
-//           t2: Obj.magic(q.join.table.columns),
-//         }->getProjection,
-//       },
-//     })
-// }
-
-//   let toSubquery = (q: t<'p1, _>, getProjection: 'p1 => 'p): 'p =>
-//     Node.makeSubquery({
-//       from: {name: q.from.name, alias: q.from.alias},
-//       joins: [],
-//       where: q.where,
-//       limit: q.limit,
-//       offset: q.offset,
-//       projection: {
-//         value: q.from.columns->getProjection,
-//       },
-//     })
-// }
-
 type t<'a, 'b> = {
   from: QueryBuilder_Source.t,
   joins: array<QueryBuilder_Join.t>,
@@ -185,3 +145,18 @@ let select = (q, getProjection: 'a => {..}) => {
   offset: q.offset,
   projection: q._projectables->getProjection->QueryBuilder_Utils.ensureNodes,
 }
+
+let selectAsSubquery = (q, getProjection: _ => {"value": 'value}): 'value =>
+  {
+    QueryBuilder_Select_Executable.from: q.from,
+    joins: q.joins,
+    where: q.where,
+    groupBy: q.groupBy,
+    having: q.having,
+    orderBy: q.orderBy,
+    limit: q.limit,
+    offset: q.offset,
+    projection: q._projectables->getProjection->QueryBuilder_Utils.ensureNodes->Obj.magic,
+  }
+  ->Node.Subquery
+  ->Obj.magic

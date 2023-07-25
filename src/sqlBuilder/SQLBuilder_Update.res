@@ -1,5 +1,5 @@
 let whereToSQL = where => {
-  where->Option.map(expr => `WHERE ${SQLBuilder_Expr.toSQL(expr)}`)
+  where->Option.map(expr => `WHERE ${SQLBuilder_Expr.toSQL(expr, SQLBuilder_Select.subqueryToSQL)}`)
 }
 
 let toSQL = (q: QueryBuilder_Update.tx<_>) => {

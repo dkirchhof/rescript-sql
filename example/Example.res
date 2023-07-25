@@ -205,15 +205,10 @@ let dql = () => {
   ->selectAll
   ->logAndExecute
 
-  // from(Schema.Artists.table)
-  // ->S1.where(c => eq(c.id, from(Schema.Artists.table)->S1.toSubquery(c => c.id)))
-  // ->S1.select(c =>
-  //   {
-  //     "id": c.id,
-  //     "name": c.name,
-  //   }
-  // )
-  // ->log
+  from(Schema.Artists.table)
+  ->where(c => eq(c.id, from(Schema.Artists.table)->selectAsSubquery(d => {"value": d.id})))
+  ->selectAll
+  ->logAndExecute
 }
 
 insertExample()

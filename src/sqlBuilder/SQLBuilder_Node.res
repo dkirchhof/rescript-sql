@@ -1,4 +1,4 @@
-let toSQL = (node: Node.t<_>) => {
+let toSQL = (node: Node.t<_>, subqueryToSQL) => {
   switch node {
   | Column(column) => {
       let columnName = switch column.tableAlias {
@@ -18,6 +18,7 @@ let toSQL = (node: Node.t<_>) => {
   | StringLiteral(string) => `'${string}'`
   | NumberLiteral(number) => Float.toString(number)
   | BooleanLiteral(bool) => bool ? "TRUE" : "FALSE"
+  | Subquery(subquery) => subqueryToSQL(subquery)
   | _ => "NOT IMPLEMENTED YET"
   }
 }
