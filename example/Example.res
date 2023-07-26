@@ -11,7 +11,7 @@ module DB = RescriptSQL.Make({
 let connection = BetterSQLite3.createConnection("example/db.db")
 
 let insertExample = () => {
-  open DB.InsertInto
+  open DB.Insert
 
   let logAndExecute = query => {
     query
@@ -42,7 +42,7 @@ let insertExample = () => {
 
 let crudExample = () => {
   let create = () => {
-    open DB.InsertInto
+    open DB.Insert
 
     let query = insertInto(Schema.Artists.table)->values([{id: 100, name: "DELETEME", genre: Null}])
 
@@ -82,7 +82,7 @@ let crudExample = () => {
   }
 
   let delete = () => {
-    open DB.DeleteFrom
+    open DB.Delete
     open DB.Expr
 
     let query = deleteFrom(Schema.Artists.table)->where(c => eq(c.id, 100))

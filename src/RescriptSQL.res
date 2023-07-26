@@ -15,7 +15,7 @@ module Make = (Adapter: Adapter) => {
   module OrderBy = QueryBuilder_OrderBy
   module Agg = QueryBuilder_Agg
 
-  module InsertInto = {
+  module Insert = {
     include QueryBuilder_Insert
     include SQLBuilder_Insert
 
@@ -37,7 +37,7 @@ module Make = (Adapter: Adapter) => {
     }
   }
 
-  module DeleteFrom = {
+  module Delete = {
     include QueryBuilder_Delete
     include SQLBuilder_Delete
 
