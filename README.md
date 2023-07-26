@@ -75,14 +75,13 @@ let songsTable = table({
 })
 ```
 
-> For tables without constraints use `tableWithoutConstraints` instead of `table` function.
+> For tables without constraints use `tableWithoutConstraints` instead of the `table` function.
 
 ### 2. Generate the sql script:
 
 ```sh
 # rescript-sql <src>.[m]js <destination>.sql
-
-$ npx rescript-sql src/Schema_.mjs src/Schema.sql"
+$ npx rescript-sql src/Schema_.mjs src/Schema.sql
 ```
 
 > You have to compile the src file before generating the sql script.
@@ -113,8 +112,7 @@ CREATE TABLE songs (
 
 ```sh
 # rescript-sql <src>.[m]js <destination>.res
-
-$ npx rescript-sql src/Schema_.mjs src/Schema.res"
+$ npx rescript-sql src/Schema_.mjs src/Schema.res
 ```
 
 > You have to compile the src file before generating the res file.
@@ -209,14 +207,22 @@ The following example uses `better-sqlite3`:
 ```res
 module DB = RescriptSQL.Make({
   type connection = BetterSQLite3.connection
-  type error = string
+  type error = option<string>
 
   let execute = (connection, sql) => {
-    BetterSQLite3.exec(connection, sql)->AsyncResult.ok
+    try {
+      BetterSQLite3.exec(connection, sql)->AsyncResult.ok
+    } catch {
+    | Exn.Error(e) => e->Exn.message->AsyncResult.error
+    }
   }
 
   let getRows = (connection, sql) => {
-    BetterSQLite3.prepare(connection, sql)->BetterSQLite3.all->AsyncResult.ok
+    try {
+      BetterSQLite3.prepare(connection, sql)->BetterSQLite3.all->AsyncResult.ok
+    } catch {
+    | Exn.Error(e) => e->Exn.message->AsyncResult.error
+    }
   }
 })
 ```
@@ -236,3 +242,7 @@ from(Schema.Artists.table)
 
 // return type: AsyncResult<array<{"artistName": string, "songName": option<string>}>>
 ```
+
+## Examples
+There is a full working example in the `example` folder.
+Use the npm scripts to generate the schema files, create a sqlite db and to run some predefined queries.
