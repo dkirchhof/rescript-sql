@@ -2,10 +2,13 @@ module DB = RescriptSQL.Make({
   type connection = BetterSQLite3.connection
   type error = string
 
-  let execute = (connection, sql) => BetterSQLite3.exec(connection, sql)->AsyncResult.ok
+  let execute = (connection, sql) => {
+    BetterSQLite3.exec(connection, sql)->AsyncResult.ok
+  }
 
-  let getRows = (connection, sql) =>
+  let getRows = (connection, sql) => {
     BetterSQLite3.prepare(connection, sql)->BetterSQLite3.all->AsyncResult.ok
+  }
 })
 
 let connection = BetterSQLite3.createConnection("example/db.db")
