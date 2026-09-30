@@ -10,7 +10,7 @@ type tx<'columns, 'update> = {
   where: option<QueryBuilder_Expr.t>,
 }
 
-let update = (table: Table.t<'columns, _, 'update>): t<'columns, 'update> => {
+let update = (table: Table.t<'columns, _, _, 'update>): t<'columns, 'update> => {
   tableName: table.name,
   columns: table.columns,
 }

@@ -57,9 +57,9 @@ type foreignKeyOptions<'fcolumns, 'fconstraints> = {
 }
 
 let foreignKey = (options: foreignKeyOptions<_>) => ForeignKey({
-  columns: Obj.magic(options.columns),
+  columns: options.columns,
   foreignTableName: options.foreignTable.tableName,
-  foreignColumns: Obj.magic(options.foreignColumns(options.foreignTable.columns)),
+  foreignColumns: options.foreignColumns(options.foreignTable.columns),
   onUpdate: options.onUpdate,
   onDelete: options.onDelete,
 })

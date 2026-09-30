@@ -14,7 +14,7 @@ let makeType = (name, columns) => {
 
   let fields = mapColumns(columns, column => {
     let resType = switch column.nullable {
-      | Some(true) => `NULL.t<${column.resType}>`
+      | Some(true) => `null<${column.resType}>`
       | _ => column.resType
     }
 

@@ -5,7 +5,7 @@ let setAggregation = (node, aggregation) =>
   }
 
 let count = (node): int => setAggregation(node, Count)
-let sum = (node): NULL.t<float> => setAggregation(node, Sum)
-let avg = (node): NULL.t<float> => setAggregation(node, Avg)
-let min = (node: 'a): NULL.t<'a> => setAggregation(node, Min)
-let max = (node: 'a): NULL.t<'a> => setAggregation(node, Max)
+let sum = (node): null<float> => setAggregation(node, Sum)
+let avg = (node): null<float> => setAggregation(node, Avg)
+let min = (node: 'a): null<'a> => setAggregation(node, Min)
+let max = (node: 'a): null<'a> => setAggregation(node, Max)

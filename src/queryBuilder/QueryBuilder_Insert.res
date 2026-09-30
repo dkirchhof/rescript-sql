@@ -9,7 +9,7 @@ type tx<'columns> = {
   values: array<'columns>,
 }
 
-let insertInto = (table: Table.t<_, 'insert, _>): t<'insert> => {
+let insertInto = (table: Table.t<_, _, 'insert, _>): t<'insert> => {
   tableName: table.name,
   columns: Obj.magic(table.columns),
 }

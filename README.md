@@ -128,19 +128,19 @@ module Artists = {
   type columns = {
     id: int,
     name: string,
-    genre: NULL.t<string>,
+    genre: null<string>,
   }
 
   type insert = {
     id?: int,
     name: string,
-    genre: NULL.t<string>,
+    genre: null<string>,
   }
 
   type update = {
     id?: int,
     name?: string,
-    genre?: NULL.t<string>,
+    genre?: null<string>,
   }
 
   type t = Table.t<columns, insert, update>

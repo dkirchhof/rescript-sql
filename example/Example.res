@@ -172,12 +172,12 @@ let dql = async () => {
 
   await from(Schema.Artists.table)
   ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->select(c => {"artistName": c.t1.name, "songName": Option.map(c.t2, t2 => t2.name)})
+  ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
   ->logAndExecute
 
   await from(Schema.Artists.table)
   ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->select(c => {"artist": {"name": c.t1.name}, "song": Option.map(c.t2, t2 => {"name": t2.name})})
+  ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
   ->logAndExecute
 
   await from(Schema.Artists.table)

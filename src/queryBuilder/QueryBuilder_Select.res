@@ -22,7 +22,7 @@ type columns2<'a, 'b> = {
   t2: 'b,
 }
 
-let from = (table: Table.t<'columns, _, _>): t<'columns, 'columns> => {
+let from = (table: Table.t<'columns, _, _, _>): t<'columns, 'columns> => {
   from: {name: table.name, alias: None},
   joins: [],
   where: None,
@@ -62,7 +62,7 @@ let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
   }
 }
 
-let innerJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _>, getOn): t<
+let innerJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _, _>, getOn): t<
   columns2<'p1, 'columns>,
   columns2<'s1, 'columns>,
 > =>
@@ -77,8 +77,8 @@ let innerJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _>, getOn): t<
     },
   )
 
-let leftJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _>, getOn): t<
-  columns2<'p1, option<'columns>>,
+let leftJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, 'nullColumns, _, _>, getOn): t<
+  columns2<'p1, 'nullColumns>,
   columns2<'s1, 'columns>,
 > =>
   _join1(
@@ -88,7 +88,7 @@ let leftJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _>, getOn): t<
     LEFT,
     {
       t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: Some(QueryBuilder_Utils.getColumnsWithTableAlias(table.columns, "t2")),
+      t2: QueryBuilder_Utils.getColumnsWithTableAlias(Obj.magic(table.columns), "t2"),
     },
   )
 
