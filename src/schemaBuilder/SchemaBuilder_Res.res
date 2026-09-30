@@ -20,6 +20,7 @@ let makeType = (name, columns) => {
 
     switch name {
     | "columns" => `${column.name}: ${resType},`
+    | "nullColumns" => `${column.name}: null<${column.resType}>,`
     | "insert" => `${column.name}${skipToString(column)}: ${resType},`
     | "update" => `${column.name}?: ${resType},`
     | _ => panic("unhandled type name")
@@ -52,6 +53,7 @@ let toRescript = (schema: SchemaBuilder_Types.table<_>) => {
   open StringBuilder
 
   let columnsType = makeType("columns", schema.columns)
+  let nullColumnsType = makeType("nullColumns", schema.columns)
   let insertType = makeType("insert", schema.columns)
   let updateType = makeType("update", schema.columns)
 
@@ -61,11 +63,13 @@ let toRescript = (schema: SchemaBuilder_Types.table<_>) => {
   ->addS(0, `module ${schema.moduleName} = {`)
   ->addS(0, columnsType)
   ->addE
+  ->addS(0, nullColumnsType)
+  ->addE
   ->addS(0, insertType)
   ->addE
   ->addS(0, updateType)
   ->addE
-  ->addS(2, "type t = Table.t<columns, insert, update>")
+  ->addS(2, "type t = Table.t<columns, nullColumns, insert, update>")
   ->addE
   ->addS(0, table)
   ->addS(0, `}`)
