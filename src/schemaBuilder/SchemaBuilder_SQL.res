@@ -20,20 +20,20 @@ let columnToSQL = (column: SchemaBuilder_Types.columnWithName) => {
 let constraintToSQL = (name: string, constraint_: SchemaBuilder_Types.tableConstraint) =>
   switch constraint_ {
   | Unique(unique) => {
-      let columns = unique.columns->Array.map(column => column.name)->Array.joinWith(", ")
+      let columns = unique.columns->Array.map(column => column.name)->Array.join(", ")
 
       `CONSTRAINT ${name} UNIQUE (${columns})`
     }
   | PrimaryKey(primaryKey) => {
-      let columns = primaryKey.columns->Array.map(column => column.name)->Array.joinWith(", ")
+      let columns = primaryKey.columns->Array.map(column => column.name)->Array.join(", ")
 
       `CONSTRAINT ${name} PRIMARY KEY (${columns})`
     }
   | ForeignKey(foreignKey) => {
-      let columns = foreignKey.columns->Array.map(column => column.name)->Array.joinWith(", ")
+      let columns = foreignKey.columns->Array.map(column => column.name)->Array.join(", ")
 
       let fcolumns =
-        foreignKey.foreignColumns->Array.map(column => column.name)->Array.joinWith(", ")
+        foreignKey.foreignColumns->Array.map(column => column.name)->Array.join(", ")
 
       `CONSTRAINT ${name} FOREIGN KEY (${columns}) REFERENCES ${foreignKey.foreignTableName} (${fcolumns})`
     }

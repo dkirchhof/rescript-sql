@@ -36,4 +36,4 @@ let addE = builder => {
   builder
 }
 
-let build = Array.joinWith
+let build = Array.join

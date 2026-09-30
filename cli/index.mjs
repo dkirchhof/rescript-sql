@@ -47,7 +47,7 @@ function generateSchemaRes() {
 
   console.log(command)
 
-  execSync(`echo "open RescriptSQL\n" >> ${resultFile}`)
+  // execSync(`echo "open RescriptSQL\n" >> ${resultFile}`)
   execSync(command);
 }
 

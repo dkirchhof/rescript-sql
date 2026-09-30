@@ -1,29 +1,21 @@
 {
   "name": "rescript-sql",
   "version": "0.0.1",
-  "description": "",
+  "author": "",
   "main": "index.js",
+  "devDependencies": {
+    "rescript": "12.3.1"
+  },
   "bin": {
     "rescript-sql": "./cli/index.mjs"
   },
-  "scripts": {
-    "dev": "rescript build -w",
-    "start-example": "rm -f example/db.db && sqlite3 example/db.db < example/Schema.sql && node example/Example.mjs",
-    "generate-sql": "cli/index.mjs example/Schema_.mjs example/Schema.sql",
-    "generate-res": "cli/index.mjs example/Schema_.mjs example/Schema.res"
-  },
+  "description": "",
   "keywords": [],
-  "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "better-sqlite3": "^8.4.0",
-    "rescript": "11.0.0-beta.3"
-  },
-  "dependencies": {
-    "@rescript/core": "^0.4.0",
-    "rescript-async-result": "github:dkirchhof/rescript-async-result"
-  },
-  "peerDependencies": {
-    "better-sqlite3": "^8.4.0"
+  "scripts": {
+    "res:dev": "rescript watch",
+    "start-example": "rm -f example/db.db && sqlite3 example/db.db < example/Schema.sql && bun example/Example.res.mjs",
+    "generate-sql": "cli/index.mjs example/Schema_.res.mjs example/Schema.sql",
+    "generate-res": "cli/index.mjs example/Schema_.res.mjs example/Schema.res"
   }
 }

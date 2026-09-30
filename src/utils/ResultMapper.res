@@ -1,6 +1,6 @@
 let map = (projection, row) => {
   let rec recMap = (projection, path) => {
-    let obj = Object.empty()
+    let obj = Object.make()
 
     projection
     ->Obj.magic

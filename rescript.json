@@ -14,16 +14,9 @@
   ],
   "package-specs": [
     {
-      "module": "es6",
+      "module": "esmodule",
       "in-source": true
     }
   ],
-  "bs-dependencies": [
-    "@rescript/core",
-    "rescript-async-result"
-  ],
-  "bsc-flags": [
-    "-open RescriptCore"
-  ],
-  "suffix": ".mjs"
+  "suffix": ".res.mjs"
 }
