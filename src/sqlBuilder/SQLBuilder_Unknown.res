@@ -1,3 +1,5 @@
-let toSQL = (unknown: Unknown.t, subqueryToSQL) => {
-  unknown->Node.fromUnknown->SQLBuilder_Node.toSQL(subqueryToSQL)
+let toSQL = (subqueryToSQL, params) => {
+  (unknown: Unknown.t) => {
+    unknown->Node.fromUnknown->SQLBuilder_Node.toSQL(subqueryToSQL, params)
+  }
 }

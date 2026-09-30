@@ -1,4 +1,6 @@
-let toSQL = (node: Node.t<_>, subqueryToSQL) => {
+let toSQL = (node: Node.t<_>, subqueryToSQL, params) => {
+  open SQLBuilder_Params
+
   switch node {
   | Column(column) => {
       let columnName = switch column.tableAlias {
@@ -15,10 +17,11 @@ let toSQL = (node: Node.t<_>, subqueryToSQL) => {
       | None => columnName
       }
     }
-  | StringLiteral(string) => `'${string}'`
-  | NumberLiteral(number) => Float.toString(number)
-  | BooleanLiteral(bool) => bool ? "TRUE" : "FALSE"
-  | Subquery(subquery) => subqueryToSQL(subquery)
+  // | StringLiteral(string) => param(params)(string)
+  // | NumberLiteral(number) => param(params)(number)
+  // | BooleanLiteral(bool) => param(params)(bool)
+  | Value(value) => param(params)(value)
+  | Subquery(subquery) => subqueryToSQL(subquery, params)
   | _ => "NOT IMPLEMENTED YET"
   }
 }
