@@ -8,12 +8,21 @@ let toSQL = (node: Node.t<_>, subqueryToSQL, params) => {
       | None => column.name
       }
 
-      switch column.aggregation {
+      let columnName = switch column.aggregation {
       | Some(Avg) => `AVG(${columnName})`
       | Some(Count) => `COUNT(${columnName})`
       | Some(Max) => `MAX(${columnName})`
       | Some(Min) => `MIN(${columnName})`
       | Some(Sum) => `SUM(${columnName})`
+      | None => columnName
+      }
+
+      switch column.jsonFunction {
+      | Some(Extract(path)) => {
+          let sanitizedPath = String.replaceAllRegExp(path, /[^\w\$\.\[\]]/g, "")
+
+          `${columnName} ->> "${sanitizedPath}"`
+        }
       | None => columnName
       }
     }

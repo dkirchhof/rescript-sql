@@ -2,6 +2,7 @@ module Expr = QueryBuilder_Expr
 module GroupBy = QueryBuilder_GroupBy
 module OrderBy = QueryBuilder_OrderBy
 module Agg = QueryBuilder_Agg
+module JSON = QueryBuilder_JSON
 
 module Insert = {
   include QueryBuilder_Insert

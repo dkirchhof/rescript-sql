@@ -30,6 +30,12 @@ let insertExample = async () => {
     {id: 21, artistId: 2, name: "Song 2_1"},
   ])
   ->logAndExecute
+
+  await insertInto(Schema.Test.table)
+  ->values([
+    {json: "{\"hello\": \"world\"}"},
+  ])
+  ->logAndExecute
 }
 
 let crudExample = async () => {
@@ -105,6 +111,7 @@ let dql = async () => {
   open RescriptSQL.GroupBy
   open RescriptSQL.OrderBy
   open! RescriptSQL.Agg
+  open RescriptSQL.JSON
 
   let logAndExecute = async query => {
     let sql = toSQL(query)
@@ -121,99 +128,104 @@ let dql = async () => {
     Logger.log(mappedResult)
   }
 
-  await from(Schema.Artists.table)->selectAll->logAndExecute
+  // await from(Schema.Artists.table)->selectAll->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->where(_ => like(Node.makeColumn({name: "name"}), "%Artist%"))
-  ->selectAll
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->where(_ => like(Node.makeColumn({name: "name"}), "%Artist%"))
+  // ->selectAll
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->where(c => eq(c.id, 1))
-  ->select(c =>
-    {
-      "name": c.name,
-      "someNumber": 1,
-      "someString": "hello world",
-      "someBoolean": true,
-    }
-  )
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->where(c => eq(c.id, 1))
+  // ->select(c =>
+  //   {
+  //     "name": c.name,
+  //     "someNumber": 1,
+  //     "someString": "hello world",
+  //     "someBoolean": true,
+  //   }
+  // )
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->select(c => {"a": {"c": c.name, "d": 1, "e": {"someBoolean": true}}})
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->select(c => {"a": {"c": c.name, "d": 1, "e": {"someBoolean": true}}})
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)->select(c => {"count": count(c.id)})->logAndExecute
-  await from(Schema.Artists.table)->select(c => {"sum": sum(c.id)})->logAndExecute
-  await from(Schema.Artists.table)->select(c => {"avg": avg(c.id)})->logAndExecute
-  await from(Schema.Artists.table)->select(c => {"min": min(c.id)})->logAndExecute
-  await from(Schema.Artists.table)->select(c => {"max": max(c.id)})->logAndExecute
+  // await from(Schema.Artists.table)->select(c => {"count": count(c.id)})->logAndExecute
+  // await from(Schema.Artists.table)->select(c => {"sum": sum(c.id)})->logAndExecute
+  // await from(Schema.Artists.table)->select(c => {"avg": avg(c.id)})->logAndExecute
+  // await from(Schema.Artists.table)->select(c => {"min": min(c.id)})->logAndExecute
+  // await from(Schema.Artists.table)->select(c => {"max": max(c.id)})->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->selectAll
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
+  // ->selectAll
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
+  // ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
+  // ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->selectAll
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
+  // ->selectAll
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
+  // ->select(c => {"artistName": c.t1.name, "songName": c.t2.name})
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->leftJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
+  // ->select(c => {"artist": {"name": c.t1.name}, "song": {"name": c.t2.name}})
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->where(c => eq(c.id, 1))
-  ->groupBy(c => [group(c.id), group(c.name)])
-  ->having(c => eq(c.id, 1))
-  ->orderBy(c => [asc(c.id), desc(c.name)])
-  ->limit(1)
-  ->offset(1)
-  ->selectAll
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->where(c => eq(c.id, 1))
+  // ->groupBy(c => [group(c.id), group(c.name)])
+  // ->having(c => eq(c.id, 1))
+  // ->orderBy(c => [asc(c.id), desc(c.name)])
+  // ->limit(1)
+  // ->offset(1)
+  // ->selectAll
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
-  ->where(c => eq(c.t1.id, 1))
-  ->groupBy(c => [group(c.t1.id), group(c.t2.name)])
-  ->having(c => eq(c.t1.id, 1))
-  ->orderBy(c => [asc(c.t1.id), desc(c.t2.name)])
-  ->limit(1)
-  ->offset(1)
-  ->selectAll
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->innerJoin1(Schema.Songs.table, c => eq(c.t2.artistId, c.t1.id))
+  // ->where(c => eq(c.t1.id, 1))
+  // ->groupBy(c => [group(c.t1.id), group(c.t2.name)])
+  // ->having(c => eq(c.t1.id, 1))
+  // ->orderBy(c => [asc(c.t1.id), desc(c.t2.name)])
+  // ->limit(1)
+  // ->offset(1)
+  // ->selectAll
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->where(c =>
-    and_([
-      ne(c.id, c.id),
-      between(c.id, 1, 2),
-      or_([inArray(c.id, [1, 2, 3]), like(c.name, "%test%")]),
-    ])
-  )
-  ->selectAll
-  ->logAndExecute
+  // await from(Schema.Artists.table)
+  // ->where(c =>
+  //   and_([
+  //     ne(c.id, c.id),
+  //     between(c.id, 1, 2),
+  //     or_([inArray(c.id, [1, 2, 3]), like(c.name, "%test%")]),
+  //   ])
+  // )
+  // ->selectAll
+  // ->logAndExecute
 
-  await from(Schema.Artists.table)
-  ->where(c => eq(c.id, from(Schema.Artists.table)->selectAsSubquery(d => {"value": d.id})))
+  // await from(Schema.Artists.table)
+  // ->where(c => eq(c.id, from(Schema.Artists.table)->selectAsSubquery(d => {"value": d.id})))
+  // ->selectAll
+  // ->logAndExecute
+
+  await from(Schema.Test.table)
+  ->where(c => eq(jsonExtract(c.json, "$.hello"), String("world")))
   ->selectAll
   ->logAndExecute
 }

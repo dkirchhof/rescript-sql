@@ -16,6 +16,12 @@ let textColumn = (options: baseColumn): column => {
   resType: "string",
 }
 
+// let jsonColumn = (options: baseColumn): column => {
+//   ...Obj.magic(options),
+//   dbType: "TEXT",
+//   resType: "JSON.t",
+// }
+
 external customColumn: baseColumnWithTypes => column = "%identity"
 
 let table = options => {

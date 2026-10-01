@@ -23,7 +23,7 @@ let songsTable = table({
     "artistId": integerColumn({}),
     "name": textColumn({size: 100}),
   },
-  constraints: c => 
+  constraints: c =>
     {
       "pk": primaryKey({columns: [c["id"]]}),
       "fkArtist": foreignKey({
@@ -34,4 +34,12 @@ let songsTable = table({
         onDelete: Cascade,
       }),
     },
+})
+
+let testTable: SchemaBuilder_Types.table<_, {.}> = table({
+  moduleName: "Test",
+  tableName: "test",
+  columns: {
+    "json": textColumn({}),
+  },
 })
