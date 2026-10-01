@@ -1,5 +1,5 @@
 let aggregate = (node, aggregation) => {
-  Node.Aggregate(aggregation, Unknown.make(node))->Obj.magic
+  Node.Aggregate(aggregation, Node.normalize(node))->Obj.magic
 }
 
 let count = (node): int => aggregate(node, Count)

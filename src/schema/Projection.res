@@ -1,13 +1,12 @@
-type t = Dict.t<Unknown.t>
+type t = Dict.t<Node.t>
 
-let normalize = (projection: 'a): 'a => {
-  let fields: Dict.t<_> = Obj.magic(projection)
+let normalize = (projection: 'a): t => {
+  let fields: Dict.t<unknown> = Obj.magic(projection)
 
   fields
   ->Dict.toArray
-  ->Array.map(((key, value)) => (key, Unknown.make(value)))
+  ->Array.map(((key, value)) => (key, Node.normalize(value)))
   ->Dict.fromArray
-  ->Obj.magic
 }
 
 // let fold = (~projection, ~mapGroup, ~mapLeaf) => {
@@ -16,7 +15,7 @@ let normalize = (projection: 'a): 'a => {
 //     ->Dict.toArray
 //     ->Array.map(((key, value)) => {
 //       let alias = `${path}${key}`
-//       let value = switch Node.fromUnknown(value) {
+//       let value = switch value {
 //       | ProjectionGroup(group) => walk(group, `${alias}.`)
 //       | node => mapLeaf(alias, node)
 //       }

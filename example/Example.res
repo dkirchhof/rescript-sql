@@ -123,7 +123,7 @@ let dql = async () => {
 
     // Logger.log(result)
 
-    let mappedResult = Array.map(result, row => ResultMapper.map(query.projection, row))
+    let mappedResult = Array.map(result, row => ResultMapper.map(query, row))
 
     Logger.log(mappedResult)
   }

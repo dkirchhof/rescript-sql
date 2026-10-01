@@ -1,22 +1,18 @@
-let map = (projection, row) => {
-  let rec recMap = (projection, path) => {
+let map = (query: QueryBuilder_Select_Executable.t<'result>, row): 'result => {
+  let rec recMap = (projection: Dict.t<Node.t>, path) => {
     let obj = Object.make()
 
     projection
-    ->Obj.magic
     ->Dict.toArray
     ->Array.forEach(((key, value)) => {
       let fullKey = `${path}${key}`
 
       switch value {
-      | Node.ProjectionGroup(nodes) => Object.set(obj, key, recMap(Obj.magic(nodes), `${fullKey}.`))
+      | Node.ProjectionGroup(nodes) => Object.set(obj, key, recMap(nodes, `${fullKey}.`))
       | Node.Column(_)
       | Node.Subquery(_)
       | Node.Aggregate(_, _)
       | Node.JsonExtract(_, _) => Object.set(obj, key, Object.get(row, fullKey))
-      // | Node.BooleanLiteral(bool) => Object.set(obj, key, bool)
-      // | Node.NumberLiteral(number) => Object.set(obj, key, number)
-      // | Node.StringLiteral(string) => Object.set(obj, key, string)
       | Node.Value(value) => Object.set(obj, key, value)
       | Node.Literal(value) => Object.set(obj, key, value)
       }
@@ -25,5 +21,5 @@ let map = (projection, row) => {
     obj
   }
 
-  recMap(projection, "")
+  recMap(query.ast.projection, "")->Obj.magic
 }

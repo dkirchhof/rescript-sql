@@ -1,12 +1,5 @@
 type t<'a, 'b> = {
-  from: QueryBuilder_Source.t,
-  joins: array<QueryBuilder_Join.t>,
-  where: option<QueryBuilder_Expr.t>,
-  groupBy: array<QueryBuilder_GroupBy.t>,
-  having: option<QueryBuilder_Expr.t>,
-  orderBy: array<QueryBuilder_OrderBy.t>,
-  limit: option<Unknown.t>,
-  offset: option<Unknown.t>,
+  ...AST.select,
   _projectables: 'a,
   _selectables: 'b,
 }
@@ -114,31 +107,38 @@ let orderBy = (q, getOrderBy) => {
 
 let limit = (q, limit: int) => {
   ...q,
-  limit: Some(Unknown.make(limit)),
+  limit: Some(Node.normalize(limit)),
 }
 
 let offset = (q, offset: int) => {
   ...q,
-  offset: Some(Unknown.make(offset)),
+  offset: Some(Node.normalize(offset)),
 }
 
-let finalize = (q, projection): QueryBuilder_Select_Executable.t<_> => {
-  from: q.from,
-  joins: q.joins,
-  where: q.where,
-  groupBy: q.groupBy,
-  having: q.having,
-  orderBy: q.orderBy,
-  limit: q.limit,
-  offset: q.offset,
-  projection: Projection.normalize(projection),
+let finalize = (q: t<_, _>, projection: 'result): QueryBuilder_Select_Executable.t<'result> => {
+  ast: {
+    select: {
+      from: q.from,
+      joins: q.joins,
+      where: q.where,
+      groupBy: q.groupBy,
+      having: q.having,
+      orderBy: q.orderBy,
+      limit: q.limit,
+      offset: q.offset,
+    },
+    projection: Projection.normalize(projection),
+  },
 }
 
-let selectAll = q => {
+let selectAll = (q: t<'projectables, _>): QueryBuilder_Select_Executable.t<'projectables> => {
   finalize(q, q._projectables)
 }
 
-let select = (q, getProjection: 'a => {..}) => {
+let select = (
+  q: t<'projectables, _>,
+  getProjection: 'projectables => ({..} as 'projection),
+): QueryBuilder_Select_Executable.t<'projection> => {
   finalize(q, getProjection(q._projectables))
 }
 

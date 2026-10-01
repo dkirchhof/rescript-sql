@@ -1,3 +1,3 @@
 let jsonExtract = (node: string, path: string): JSON.t => {
-  Node.JsonExtract(Unknown.make(node), Unknown.make(path))->Obj.magic
+  Node.JsonExtract(Node.normalize(node), Node.normalize(path))->Obj.magic
 }

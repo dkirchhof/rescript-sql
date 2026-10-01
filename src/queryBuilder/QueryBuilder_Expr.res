@@ -1,51 +1,37 @@
-type rec t =
-  | And(array<t>)
-  | Or(array<t>)
-  | Equal(Unknown.t, Unknown.t)
-  | NotEqual(Unknown.t, Unknown.t)
-  | GreaterThan(Unknown.t, Unknown.t)
-  | GreaterThanEqual(Unknown.t, Unknown.t)
-  | LessThan(Unknown.t, Unknown.t)
-  | LessThanEqual(Unknown.t, Unknown.t)
-  | Between(Unknown.t, Unknown.t, Unknown.t)
-  | NotBetween(Unknown.t, Unknown.t, Unknown.t)
-  | In(Unknown.t, array<Unknown.t>)
-  | NotIn(Unknown.t, array<Unknown.t>)
-  | Like(Unknown.t, string)
-  | NotLike(Unknown.t, string)
-  | ILike(Unknown.t, string)
-  | NotILike(Unknown.t, string)
+open AST
+
+type t = predicate
 
 let and_ = expressions => And(expressions)
 let or_ = expressions => Or(expressions)
-let eq = (left: 't, right: 't) => Equal(Unknown.make(left), Unknown.make(right))
-let ne = (left: 't, right: 't) => NotEqual(Unknown.make(left), Unknown.make(right))
-let gt = (left: 't, right: 't) => GreaterThan(Unknown.make(left), Unknown.make(right))
-let gte = (left: 't, right: 't) => GreaterThanEqual(Unknown.make(left), Unknown.make(right))
-let lt = (left: 't, right: 't) => LessThan(Unknown.make(left), Unknown.make(right))
-let lte = (left: 't, right: 't) => LessThanEqual(Unknown.make(left), Unknown.make(right))
+let eq = (left: 't, right: 't) => Equal(Node.normalize(left), Node.normalize(right))
+let ne = (left: 't, right: 't) => NotEqual(Node.normalize(left), Node.normalize(right))
+let gt = (left: 't, right: 't) => GreaterThan(Node.normalize(left), Node.normalize(right))
+let gte = (left: 't, right: 't) => GreaterThanEqual(Node.normalize(left), Node.normalize(right))
+let lt = (left: 't, right: 't) => LessThan(Node.normalize(left), Node.normalize(right))
+let lte = (left: 't, right: 't) => LessThanEqual(Node.normalize(left), Node.normalize(right))
 
 let between = (left: 't, min: 't, max: 't) => Between(
-  Unknown.make(left),
-  Unknown.make(min),
-  Unknown.make(max),
+  Node.normalize(left),
+  Node.normalize(min),
+  Node.normalize(max),
 )
 
 let notBetween = (left: 't, min: 't, max: 't) => NotBetween(
-  Unknown.make(left),
-  Unknown.make(min),
-  Unknown.make(max),
+  Node.normalize(left),
+  Node.normalize(min),
+  Node.normalize(max),
 )
 
-let inArray = (left: 't, array: array<'t>) => In(Unknown.make(left), Array.map(array, Unknown.make))
+let inArray = (left: 't, array: array<'t>) => In(Node.normalize(left), Array.map(array, Node.normalize))
 
 let notInArray = (left: 't, array: array<'t>) => NotIn(
-  Unknown.make(left),
-  Array.map(array, Unknown.make),
+  Node.normalize(left),
+  Array.map(array, Node.normalize),
 )
 
-let like = (left: string, right: string) => Like(Unknown.make(left), right)
-let notLike = (left: string, right: string) => NotLike(Unknown.make(left), right)
+let like = (left: string, right: string) => Like(Node.normalize(left), Node.normalize(right))
+let notLike = (left: string, right: string) => NotLike(Node.normalize(left), Node.normalize(right))
 
-let ilike = (left: string, right: string) => ILike(Unknown.make(left), right)
-let notILike = (left: string, right: string) => NotILike(Unknown.make(left), right)
+let ilike = (left: string, right: string) => ILike(Node.normalize(left), Node.normalize(right))
+let notILike = (left: string, right: string) => NotILike(Node.normalize(left), Node.normalize(right))

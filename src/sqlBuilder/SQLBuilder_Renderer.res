@@ -1,6 +1,6 @@
-type renderer<'projection, 'insert, 'columns, 'update, 'deleteColumns> = {
+type renderer<'insert, 'columns, 'update, 'deleteColumns> = {
   params: array<unknown>,
-  renderSelect: (QueryBuilder_Select_Executable.t<'projection>, int) => string,
+  renderSelect: (AST.selectEx, int) => string,
   renderInsert: QueryBuilder_Insert.tx<'insert> => string,
   renderUpdate: QueryBuilder_Update.tx<'columns, 'update> => string,
   renderDelete: QueryBuilder_Delete.t<'deleteColumns> => string,
@@ -22,7 +22,7 @@ let makeRenderer = () => {
     }
   }
 
-  let rec nodeToSQL = (node: Node.t<_>) => {
+  let rec nodeToSQL = (node: Node.t) => {
     switch node {
     | Column(column) =>
       switch column.tableAlias {
@@ -30,7 +30,7 @@ let makeRenderer = () => {
       | None => column.name
       }
     | Aggregate(aggregation, operand) => {
-        let operand = unknownToSQL(operand)
+        let operand = nodeToSQL(operand)
         let functionName = switch aggregation {
         | Avg => "AVG"
         | Count => "COUNT"
@@ -42,8 +42,8 @@ let makeRenderer = () => {
         `${functionName}(${operand})`
       }
     | JsonExtract(operand, path) => {
-        let operand = unknownToSQL(operand)
-        let path = unknownToSQL(path)
+        let operand = nodeToSQL(operand)
+        let path = nodeToSQL(path)
 
         `(${operand} ->> ${path})`
       }
@@ -53,9 +53,6 @@ let makeRenderer = () => {
     | ProjectionGroup(_) => panic("projection groups must be rendered as fields")
     }
   }
-  and unknownToSQL = (unknown: Unknown.t) => {
-    nodeToSQL(Node.fromUnknown(unknown))
-  }
   and exprToSQL = (expr: QueryBuilder_Expr.t) => {
     let groupToSQL = (expressions, operator) => {
       let parts = expressions->Array.map(exprToSQL)->Array.join(` ${operator} `)
@@ -64,32 +61,25 @@ let makeRenderer = () => {
     }
 
     let simpleExprToSQL = (left, right, operator) => {
-      let left = unknownToSQL(left)
-      let right = unknownToSQL(right)
+      let left = nodeToSQL(left)
+      let right = nodeToSQL(right)
 
       `${left} ${operator} ${right}`
     }
 
     let betweenExprToSQL = (left, min, max, operator) => {
-      let left = unknownToSQL(left)
-      let min = unknownToSQL(min)
-      let max = unknownToSQL(max)
+      let left = nodeToSQL(left)
+      let min = nodeToSQL(min)
+      let max = nodeToSQL(max)
 
       `${left} ${operator} ${min} AND ${max}`
     }
 
     let inExprToSQL = (left, array, operator) => {
-      let left = unknownToSQL(left)
-      let array = array->Array.map(unknownToSQL)->Array.join(", ")
+      let left = nodeToSQL(left)
+      let array = array->Array.map(nodeToSQL)->Array.join(", ")
 
       `${left} ${operator} (${array})`
-    }
-
-    let likeExprToSQL = (left, right, operator) => {
-      let left = unknownToSQL(left)
-      let right = unknownToSQL(Unknown.make(right))
-
-      `${left} ${operator} ${right}`
     }
 
     switch expr {
@@ -105,10 +95,10 @@ let makeRenderer = () => {
     | NotBetween(left, min, max) => betweenExprToSQL(left, min, max, "NOT BETWEEN")
     | In(left, array) => inExprToSQL(left, array, "IN")
     | NotIn(left, array) => inExprToSQL(left, array, "NOT IN")
-    | Like(left, right) => likeExprToSQL(left, right, "LIKE")
-    | NotLike(left, right) => likeExprToSQL(left, right, "NOT LIKE")
-    | ILike(left, right) => likeExprToSQL(left, right, "ILIKE")
-    | NotILike(left, right) => likeExprToSQL(left, right, "NOT ILIKE")
+    | Like(left, right) => simpleExprToSQL(left, right, "LIKE")
+    | NotLike(left, right) => simpleExprToSQL(left, right, "NOT LIKE")
+    | ILike(left, right) => simpleExprToSQL(left, right, "ILIKE")
+    | NotILike(left, right) => simpleExprToSQL(left, right, "NOT ILIKE")
     }
   }
   and clauseToSQL = (keyword: string, expression) => {
@@ -116,12 +106,11 @@ let makeRenderer = () => {
   }
   and whereToSQL = expression => clauseToSQL("WHERE", expression)
   and havingToSQL = expression => clauseToSQL("HAVING", expression)
-  and projectionToSQL = projection => {
-    let rec getFields = (projection, path) => {
+  and projectionToSQL = (projection: Dict.t<Node.t>) => {
+    let rec getFields = (projection: Dict.t<Node.t>, path) => {
       projection
       ->Dict.toArray
       ->Array.flatMap(((alias, node)) => {
-        let node = Node.fromUnknown(node)
         let fullAlias = `${path}${alias}`
 
         switch node {
@@ -139,7 +128,7 @@ let makeRenderer = () => {
       })
     }
 
-    let fields = projection->Obj.magic->getFields("")
+    let fields = getFields(projection, "")
 
     `SELECT ${Array.join(fields, ", ")}`
   }
@@ -161,7 +150,7 @@ let makeRenderer = () => {
     switch groupBys {
     | [] => None
     | _ => {
-        let parts = groupBys->Array.map(unknownToSQL)->Array.join(", ")
+        let parts = groupBys->Array.map(nodeToSQL)->Array.join(", ")
 
         Some(`GROUP BY ${parts}`)
       }
@@ -174,7 +163,7 @@ let makeRenderer = () => {
         let parts =
           orderBys
           ->Array.map(orderBy => {
-            let node = unknownToSQL(orderBy.node)
+            let node = nodeToSQL(orderBy.node)
             let direction = (orderBy.direction :> string)
 
             `${node} ${direction}`
@@ -185,27 +174,27 @@ let makeRenderer = () => {
       }
     }
   }
-  and renderSelect = (q: QueryBuilder_Select_Executable.t<_>, indentation) => {
+  and renderSelect = (q: AST.selectEx, indentation) => {
     open StringBuilder
 
     let limitToSQL = limit => {
-      limit->Option.map(l => `LIMIT ${unknownToSQL(l)}`)
+      limit->Option.map(l => `LIMIT ${nodeToSQL(l)}`)
     }
 
     let offsetToSQL = offset => {
-      offset->Option.map(o => `OFFSET ${unknownToSQL(o)}`)
+      offset->Option.map(o => `OFFSET ${nodeToSQL(o)}`)
     }
 
     make()
     ->addS(indentation, projectionToSQL(q.projection))
-    ->addS(indentation, fromToSQL(q.from))
-    ->addM(indentation, joinsToSQL(q.joins))
-    ->addSO(indentation, whereToSQL(q.where))
-    ->addSO(indentation, groupByToSQL(q.groupBy))
-    ->addSO(indentation, havingToSQL(q.having))
-    ->addSO(indentation, orderByToSQL(q.orderBy))
-    ->addSO(indentation, limitToSQL(q.limit))
-    ->addSO(indentation, offsetToSQL(q.offset))
+    ->addS(indentation, fromToSQL(q.select.from))
+    ->addM(indentation, joinsToSQL(q.select.joins))
+    ->addSO(indentation, whereToSQL(q.select.where))
+    ->addSO(indentation, groupByToSQL(q.select.groupBy))
+    ->addSO(indentation, havingToSQL(q.select.having))
+    ->addSO(indentation, orderByToSQL(q.select.orderBy))
+    ->addSO(indentation, limitToSQL(q.select.limit))
+    ->addSO(indentation, offsetToSQL(q.select.offset))
     ->build("\n")
   }
 

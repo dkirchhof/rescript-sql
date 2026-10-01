@@ -1,6 +1,6 @@
-type direction = ASC | DESC
+open AST
 
-type t = {node: Unknown.t, direction: direction}
+type t = orderBy
 
-let asc = node => {node: Unknown.make(node), direction: ASC}
-let desc = node => {node: Unknown.make(node), direction: DESC}
+let asc = node => {node: Node.normalize(node), direction: ASC}
+let desc = node => {node: Node.normalize(node), direction: DESC}

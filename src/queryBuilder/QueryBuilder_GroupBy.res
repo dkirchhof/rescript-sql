@@ -1,3 +1,3 @@
-type t = Unknown.t
+type t = Node.t
 
-external group: 'a => t = "%identity"
+let group = Node.normalize

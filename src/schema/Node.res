@@ -1,15 +1,33 @@
-type aggregation = Count | Sum | Avg | Min | Max
+include AST
 
-type rec t<'a> =
-  | ProjectionGroup(Dict.t<Unknown.t>)
-  | Column(Column.t)
-  | Subquery(QueryBuilder_Select_Executable.t<'a>)
-  | Value(unknown)
-  | Literal(EscapeValues.t)
-  | Aggregate(aggregation, Unknown.t)
-  | JsonExtract(Unknown.t, Unknown.t)
+type t = node
 
-external fromUnknown: Unknown.t => t<_> = "%identity"
+let makeColumn = (column: Column.t) => {
+  Column(column)->Obj.magic
+}
 
-let makeColumn = (column: Column.t) => Column(column)->Obj.magic
-let makeSubquery = (subquery: QueryBuilder_Select_Executable.t<_>) => Subquery(subquery)->Obj.magic
+let makeSubquery = (subquery: QueryBuilder_Select_Executable.t<_>) => {
+  Subquery(subquery.ast)->Obj.magic
+}
+
+let normalize: 'a => t = %raw(`
+  function normalize(value) {
+    if (value !== null && typeof value === "object") {
+      if (value.TAG) {
+        return value;
+      }
+
+      return {
+        TAG: "ProjectionGroup",
+        _0: Object.fromEntries(
+          Object.entries(value).map(([key, field]) => [key, normalize(field)])
+        ),
+      };
+    }
+
+    return {
+      TAG: "Value",
+      _0: value,
+    };
+  }
+`)
