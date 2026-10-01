@@ -58,7 +58,7 @@ let tableToSQL = (schema: SchemaBuilder_Types.table<_>) => {
   ->addS(0, `CREATE TABLE ${schema.tableName} (`)
   ->addS(0, body)
   ->addS(0, `);`)
-  ->addS(0, "")
+  ->addE
   ->build("\n")
 }
 
@@ -67,7 +67,7 @@ let viewToSQL = (schema: SchemaBuilder_Types.view<_>) => {
 
   make()
   ->addS(0, `CREATE VIEW ${schema.viewName} AS`)
-  ->addS(2, `${schema.sql};`)
+  ->addS(0, `${schema.sql};`)
   ->addE
   ->build("\n")
 }
