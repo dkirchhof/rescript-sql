@@ -18,6 +18,7 @@ let map = (projection, row) => {
       // | Node.NumberLiteral(number) => Object.set(obj, key, number)
       // | Node.StringLiteral(string) => Object.set(obj, key, string)
       | Node.Value(value) => Object.set(obj, key, value)
+      | Node.Literal(value) => Object.set(obj, key, value)
       }
     })
 

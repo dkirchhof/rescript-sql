@@ -5,8 +5,8 @@ type t<'a, 'b> = {
   groupBy: array<QueryBuilder_GroupBy.t>,
   having: option<QueryBuilder_Expr.t>,
   orderBy: array<QueryBuilder_OrderBy.t>,
-  limit: option<int>,
-  offset: option<int>,
+  limit: option<Unknown.t>,
+  offset: option<Unknown.t>,
   _projectables: 'a,
   _selectables: 'b,
 }
@@ -112,14 +112,14 @@ let orderBy = (q, getOrderBy) => {
   orderBy: getOrderBy(q._selectables),
 }
 
-let limit = (q, limit) => {
+let limit = (q, limit: int) => {
   ...q,
-  limit: Some(limit),
+  limit: Some(Unknown.make(limit)),
 }
 
-let offset = (q, offset) => {
+let offset = (q, offset: int) => {
   ...q,
-  offset: Some(offset),
+  offset: Some(Unknown.make(offset)),
 }
 
 let finalize = (q, projection): QueryBuilder_Select_Executable.t<_> => {

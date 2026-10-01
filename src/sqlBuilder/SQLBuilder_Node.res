@@ -22,11 +22,12 @@ let rec toSQL = (node: Node.t<_>, subqueryToSQL, params) => {
     }
   | JsonExtract(operand, path) => {
       let operand = toSQL(Node.fromUnknown(operand), subqueryToSQL, params)
-      let path = param(params)(path)
+      let path = toSQL(Node.fromUnknown(path), subqueryToSQL, params)
 
       `(${operand} ->> ${path})`
     }
   | Value(value) => param(params)(value)
+  | Literal(value) => EscapeValues.escape(value)
   | Subquery(subquery) => subqueryToSQL(subquery, params)
   | ProjectionGroup(_) => panic("projection groups must be rendered as fields")
   }

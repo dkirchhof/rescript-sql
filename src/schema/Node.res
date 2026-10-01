@@ -5,8 +5,9 @@ type rec t<'a> =
   | Column(Column.t)
   | Subquery(QueryBuilder_Select_Executable.t<'a>)
   | Value(unknown)
+  | Literal(EscapeValues.t)
   | Aggregate(aggregation, Unknown.t)
-  | JsonExtract(Unknown.t, string)
+  | JsonExtract(Unknown.t, Unknown.t)
 
 external fromUnknown: Unknown.t => t<_> = "%identity"
 

@@ -30,11 +30,10 @@ let rec toSQL = (expr: QueryBuilder_Expr.t, subqueryToSQL, params) => {
   }
 
   let likeExprToSQL = (left, right, operator) => {
-    open SQLBuilder_Params
-
     let left = unknownToSQL(left)
+    let right = unknownToSQL(Unknown.make(right))
 
-    `${left} ${operator} ${param(params)(right)}`
+    `${left} ${operator} ${right}`
   }
 
   switch expr {

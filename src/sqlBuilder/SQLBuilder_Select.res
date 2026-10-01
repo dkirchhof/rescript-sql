@@ -90,15 +90,16 @@ let orderByToSQL = (orderBys: array<QueryBuilder_OrderBy.t>, subqueryToSQL, para
 }
 
 let rec toSQLWithIndentation = (q, params, indentation) => {
-  open SQLBuilder_Params
   open StringBuilder
 
+  let operandToSQL = SQLBuilder_Unknown.toSQL(subqueryToSQL, params)
+
   let limitToSQL = limit => {
-    limit->Option.map(l => `LIMIT ${param(params)(l)}`)
+    limit->Option.map(l => `LIMIT ${operandToSQL(l)}`)
   }
 
   let offsetToSQL = offset => {
-    offset->Option.map(o => `OFFSET ${param(params)(o)}`)
+    offset->Option.map(o => `OFFSET ${operandToSQL(o)}`)
   }
 
   make()
