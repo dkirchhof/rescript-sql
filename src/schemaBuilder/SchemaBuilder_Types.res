@@ -18,7 +18,7 @@ type column = {
   resType: string,
 }
 
-type fkConstraint = NoAction | SetNull | SetDefault | Cascade
+type fkConstraint = NoAction | SetNull | SetDefault | Cascade | Restrict
 
 type tableConstraint =
   | Unique({columns: array<column>})
