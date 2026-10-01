@@ -7,7 +7,7 @@ type tx<'columns, 'update> = {
   tableName: string,
   columns: 'columns,
   patch: 'update,
-  where: option<QueryBuilder_Expr.t>,
+  where: option<AST.predicate>,
 }
 
 let update = (table: Table.t<'columns, _, _, 'update>): t<'columns, 'update> => {

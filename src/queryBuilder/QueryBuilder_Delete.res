@@ -1,7 +1,7 @@
 type t<'columns> = {
   tableName: string,
   columns: 'columns,
-  where: option<QueryBuilder_Expr.t>,
+  where: option<AST.predicate>,
 }
 
 let deleteFrom = (table: Table.t<_>) => {

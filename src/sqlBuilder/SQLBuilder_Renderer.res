@@ -62,7 +62,7 @@ let makeRenderer = () => {
     | ProjectionGroup(_) => panic("projection groups must be rendered as fields")
     }
   }
-  and exprToSQL = (expr: QueryBuilder_Expr.t) => {
+  and exprToSQL = (expr: AST.predicate) => {
     let groupToSQL = (expressions, operator) => {
       let parts = expressions->Array.map(exprToSQL)->Array.join(` ${operator} `)
 

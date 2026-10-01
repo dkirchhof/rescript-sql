@@ -1,7 +1,5 @@
 open AST
 
-type t = predicate
-
 let and_ = expressions => And(expressions)
 let or_ = expressions => Or(expressions)
 let eq = (left: 't, right: 't) => Equal(Node.normalize(left), Node.normalize(right))
