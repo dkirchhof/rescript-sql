@@ -18,23 +18,27 @@ let makeColumn = (options: baseColumn, dbType, resType): column => {
 let integerColumn = options => makeColumn(options, "INTEGER", "int")
 let textColumn = options => makeColumn(options, "TEXT", "string")
 
-let table = options => {
+let nameColumns = (columns: 'columns): 'columns => {
+  columns
+  ->Obj.magic
+  ->Dict.toArray
+  ->Array.map(((columnName, columnConfig: column)) => (
+    columnName,
+    {...columnConfig, name: columnName},
+  ))
+  ->Dict.fromArray
+  ->Obj.magic
+}
+
+let table = (options: table<'columns, 'constraints>): table<'columns, 'constraints> => {
   let table = {
     ...options,
-    columns: options.columns
-    ->Obj.magic
-    ->Dict.toArray
-    ->Array.map(((columnName, columnConfig: column)) => (
-      columnName,
-      {...columnConfig, name: columnName},
-    ))
-    ->Dict.fromArray
-    ->Obj.magic,
+    columns: nameColumns(options.columns),
   }
 
   switch process.argv[2] {
-  | Some("generate:res") => table->SchemaBuilder_Res.toRescript->Console.log
-  | Some("generate:sql") => table->SchemaBuilder_SQL.toSQL->Console.log
+  | Some("generate:res") => table->SchemaBuilder_Res.tableToRescript->Console.log
+  | Some("generate:sql") => table->SchemaBuilder_SQL.tableToSQL->Console.log
   | _ => ()
   }
 
@@ -42,6 +46,21 @@ let table = options => {
 }
 
 let tableWithoutConstraints: table<'columns, _> => table<'columns, {.}> = table
+
+let view = (options: view<'columns>): view<'columns> => {
+  let view = {
+    ...options,
+    columns: nameColumns(options.columns),
+  }
+
+  switch process.argv[2] {
+  | Some("generate:res") => view->SchemaBuilder_Res.viewToRescript->Console.log
+  | Some("generate:sql") => view->SchemaBuilder_SQL.viewToSQL->Console.log
+  | _ => ()
+  }
+
+  view
+}
 
 type uniqueOptions = {columns: array<column>}
 

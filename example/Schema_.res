@@ -43,3 +43,12 @@ let testTable = tableWithoutConstraints({
     "json": textColumn({}),
   },
 })
+
+let artistNamesView = view({
+  moduleName: "ArtistNames",
+  viewName: "artistNames",
+  columns: {
+    "name": textColumn({}),
+  },
+  sql: "SELECT name FROM artists",
+})

@@ -37,3 +37,10 @@ type table<'columns, 'constraints> = {
   columns: {..} as 'columns,
   constraints?: 'columns => ({..} as 'constraints),
 }
+
+type view<'columns> = {
+  moduleName: string,
+  viewName: string,
+  columns: {..} as 'columns,
+  sql: string,
+}

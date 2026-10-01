@@ -39,7 +39,7 @@ let constraintToSQL = (name: string, constraint_: SchemaBuilder_Types.tableConst
     }
   }
 
-let toSQL = (schema: SchemaBuilder_Types.table<_>) => {
+let tableToSQL = (schema: SchemaBuilder_Types.table<_>) => {
   open StringBuilder
 
   let columns = schema.columns->Obj.magic->Dict.valuesToArray->Array.map(columnToSQL)
@@ -59,5 +59,22 @@ let toSQL = (schema: SchemaBuilder_Types.table<_>) => {
   ->addS(0, body)
   ->addS(0, `);`)
   ->addS(0, "")
+  ->build("\n")
+}
+
+let viewToSQL = (schema: SchemaBuilder_Types.view<_>) => {
+  open StringBuilder
+
+  let columns =
+    schema.columns
+    ->Obj.magic
+    ->Dict.valuesToArray
+    ->Array.map((column: SchemaBuilder_Types.column) => column.name)
+    ->Array.join(", ")
+
+  make()
+  ->addS(0, `CREATE VIEW ${schema.viewName} (${columns}) AS`)
+  ->addS(2, `${schema.sql};`)
+  ->addE
   ->build("\n")
 }

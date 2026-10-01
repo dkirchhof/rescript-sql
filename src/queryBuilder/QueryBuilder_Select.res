@@ -15,8 +15,8 @@ type columns2<'a, 'b> = {
   t2: 'b,
 }
 
-let from = (table: Table.t<'columns, _, _, _>): t<'columns, 'columns> => {
-  from: {name: table.name, alias: None},
+let from = (source: Source.t<'columns, _, _>): t<'columns, 'columns> => {
+  from: {name: source.name, alias: None},
   joins: [],
   where: None,
   groupBy: [],
@@ -24,14 +24,14 @@ let from = (table: Table.t<'columns, _, _, _>): t<'columns, 'columns> => {
   orderBy: [],
   limit: None,
   offset: None,
-  _projectables: table.columns,
-  _selectables: table.columns,
+  _projectables: source.columns,
+  _selectables: source.columns,
 }
 
-let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
+let _join1 = (q, source: Source.t<_, _, _>, getOn, joinType, _projectables) => {
   let _selectables = {
     t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._selectables, "t1"),
-    t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.columns, "t2"),
+    t2: QueryBuilder_Utils.getColumnsWithTableAlias(source.columns, "t2"),
   }
 
   {
@@ -43,7 +43,7 @@ let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
     joins: [
       {
         table: {
-          name: table.name,
+          name: source.name,
           alias: Some("t2"),
         },
         joinType,
@@ -55,33 +55,33 @@ let _join1 = (q, table: Table.t<_>, getOn, joinType, _projectables) => {
   }
 }
 
-let innerJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, _, _, _>, getOn): t<
+let innerJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, _, _>, getOn): t<
   columns2<'p1, 'columns>,
   columns2<'s1, 'columns>,
 > =>
   _join1(
     q,
-    table,
+    source,
     getOn,
     INNER,
     {
       t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: QueryBuilder_Utils.getColumnsWithTableAlias(table.columns, "t2"),
+      t2: QueryBuilder_Utils.getColumnsWithTableAlias(source.columns, "t2"),
     },
   )
 
-let leftJoin1 = (q: t<'p1, 's1>, table: Table.t<'columns, 'nullColumns, _, _>, getOn): t<
+let leftJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, 'nullColumns, _>, getOn): t<
   columns2<'p1, 'nullColumns>,
   columns2<'s1, 'columns>,
 > =>
   _join1(
     q,
-    table,
+    source,
     getOn,
     LEFT,
     {
       t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
-      t2: QueryBuilder_Utils.getColumnsWithTableAlias(Obj.magic(table.columns), "t2"),
+      t2: QueryBuilder_Utils.getColumnsWithTableAlias(Obj.magic(source.columns), "t2"),
     },
   )
 

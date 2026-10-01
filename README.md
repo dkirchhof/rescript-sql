@@ -27,7 +27,7 @@ $ npm install dkirchhof/rescript-sql
 
 The usage of this library is splitted into four parts:
 
-1. Use the schema builder dsl to define the schema of all tables.
+1. Use the schema builder dsl to define tables and views.
 2. Generate a sql script with the corresponding ddl queries.
 3. Generate a res file with the corresponding rescript types.
 4. Use the query builder dsl to create dql and dml queries.

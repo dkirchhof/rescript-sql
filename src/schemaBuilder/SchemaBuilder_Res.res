@@ -32,16 +32,16 @@ let makeType = (name, columns) => {
   make()->addS(2, `type ${name} = {`)->addS(0, body)->addS(2, "}")->build("\n")
 }
 
-let makeTable = (schema: SchemaBuilder_Types.table<_>) => {
+let makeSource = (sourceType, sourceName, columns) => {
   open StringBuilder
 
-  let columns = mapColumns(schema.columns, column => {
+  let columns = mapColumns(columns, column => {
     `"${column.name}": Node.Column({name: "${column.name}"}),`
   })
 
   make()
-  ->addS(2, `let table: t = {`)
-  ->addS(4, `name: "${schema.tableName}",`)
+  ->addS(2, `let ${sourceType}: t = {`)
+  ->addS(4, `name: "${sourceName}",`)
   ->addS(4, `columns: Obj.magic({`)
   ->addM(6, columns)
   ->addS(4, `}),`)
@@ -49,7 +49,11 @@ let makeTable = (schema: SchemaBuilder_Types.table<_>) => {
   ->build("\n")
 }
 
-let toRescript = (schema: SchemaBuilder_Types.table<_>) => {
+let makeTable = (schema: SchemaBuilder_Types.table<_>) => {
+  makeSource("table", schema.tableName, schema.columns)
+}
+
+let tableToRescript = (schema: SchemaBuilder_Types.table<_>) => {
   open StringBuilder
 
   let columnsType = makeType("columns", schema.columns)
@@ -73,6 +77,27 @@ let toRescript = (schema: SchemaBuilder_Types.table<_>) => {
   ->addE
   ->addS(0, table)
   ->addS(0, `}`)
+  ->addE
+  ->build("\n")
+}
+
+let viewToRescript = (schema: SchemaBuilder_Types.view<_>) => {
+  open StringBuilder
+
+  let columnsType = makeType("columns", schema.columns)
+  let nullColumnsType = makeType("nullColumns", schema.columns)
+  let view = makeSource("view", schema.viewName, schema.columns)
+
+  make()
+  ->addS(0, `module ${schema.moduleName} = {`)
+  ->addS(0, columnsType)
+  ->addE
+  ->addS(0, nullColumnsType)
+  ->addE
+  ->addS(2, "type t = View.t<columns, nullColumns>")
+  ->addE
+  ->addS(0, view)
+  ->addS(0, "}")
   ->addE
   ->build("\n")
 }
