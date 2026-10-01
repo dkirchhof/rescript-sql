@@ -122,8 +122,8 @@ let offset = (q, offset) => {
   offset: Some(offset),
 }
 
-let selectAll = q => {
-  QueryBuilder_Select_Executable.from: q.from,
+let finalize = (q, projection): QueryBuilder_Select_Executable.t<_> => {
+  from: q.from,
   joins: q.joins,
   where: q.where,
   groupBy: q.groupBy,
@@ -131,32 +131,17 @@ let selectAll = q => {
   orderBy: q.orderBy,
   limit: q.limit,
   offset: q.offset,
-  projection: q._projectables->QueryBuilder_Utils.ensureNodes,
+  projection: Projection.normalize(projection),
+}
+
+let selectAll = q => {
+  finalize(q, q._projectables)
 }
 
 let select = (q, getProjection: 'a => {..}) => {
-  QueryBuilder_Select_Executable.from: q.from,
-  joins: q.joins,
-  where: q.where,
-  groupBy: q.groupBy,
-  having: q.having,
-  orderBy: q.orderBy,
-  limit: q.limit,
-  offset: q.offset,
-  projection: q._projectables->getProjection->QueryBuilder_Utils.ensureNodes,
+  finalize(q, getProjection(q._projectables))
 }
 
-let selectAsSubquery = (q, getProjection: _ => {"value": 'value}): 'value =>
-  {
-    QueryBuilder_Select_Executable.from: q.from,
-    joins: q.joins,
-    where: q.where,
-    groupBy: q.groupBy,
-    having: q.having,
-    orderBy: q.orderBy,
-    limit: q.limit,
-    offset: q.offset,
-    projection: q._projectables->getProjection->QueryBuilder_Utils.ensureNodes->Obj.magic,
-  }
-  ->Node.Subquery
-  ->Obj.magic
+let selectAsSubquery = (q, getProjection: _ => {"value": 'value}): 'value => {
+  finalize(q, getProjection(q._projectables))->Node.makeSubquery
+}

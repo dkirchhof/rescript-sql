@@ -2,9 +2,6 @@ type rec t<'a> =
   | ProjectionGroup(Dict.t<Unknown.t>)
   | Column(Column.t)
   | Subquery(QueryBuilder_Select_Executable.t<'a>)
-  // | StringLiteral(string)
-  // | NumberLiteral(float)
-  // | BooleanLiteral(bool)
   | Value(unknown)
 
 external fromUnknown: Unknown.t => t<_> = "%identity"

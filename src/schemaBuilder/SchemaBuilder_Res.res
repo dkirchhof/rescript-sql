@@ -1,8 +1,8 @@
-let mapColumns = (columns, fn: SchemaBuilder_Types.columnWithName => string) => {
+let mapColumns = (columns, fn: SchemaBuilder_Types.column => string) => {
   columns->Obj.magic->Dict.valuesToArray->Array.map(fn)
 }
 
-let skipToString = (column: SchemaBuilder_Types.columnWithName) => {
+let skipToString = (column: SchemaBuilder_Types.column) => {
   switch column.skipInInsertQuery {
   | Some(true) => "?"
   | _ => ""

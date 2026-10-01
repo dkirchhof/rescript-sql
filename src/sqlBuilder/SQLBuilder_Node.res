@@ -26,11 +26,8 @@ let toSQL = (node: Node.t<_>, subqueryToSQL, params) => {
       | None => columnName
       }
     }
-  // | StringLiteral(string) => param(params)(string)
-  // | NumberLiteral(number) => param(params)(number)
-  // | BooleanLiteral(bool) => param(params)(bool)
   | Value(value) => param(params)(value)
   | Subquery(subquery) => subqueryToSQL(subquery, params)
-  | _ => "NOT IMPLEMENTED YET"
+  | ProjectionGroup(_) => panic("projection groups must be rendered as fields")
   }
 }

@@ -12,21 +12,21 @@ type baseColumnWithTypes = {
 }
 
 type column = {
-  ...baseColumnWithTypes,
+  ...baseColumn,
   name: string,
+  dbType: string,
+  resType: string,
 }
-
-type columnWithName = column
 
 type fkConstraint = NoAction | SetNull | SetDefault | Cascade
 
 type tableConstraint =
-  | Unique({columns: array<columnWithName>})
-  | PrimaryKey({columns: array<columnWithName>})
+  | Unique({columns: array<column>})
+  | PrimaryKey({columns: array<column>})
   | ForeignKey({
-      columns: array<columnWithName>,
+      columns: array<column>,
       foreignTableName: string,
-      foreignColumns: array<columnWithName>,
+      foreignColumns: array<column>,
       onUpdate: fkConstraint,
       onDelete: fkConstraint,
     })

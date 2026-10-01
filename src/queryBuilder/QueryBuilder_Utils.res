@@ -12,13 +12,3 @@ let getColumnsWithTableAlias = (columns: 'a, tableAlias): 'a => {
   ->Dict.fromArray
   ->Obj.magic
 }
-
-let ensureNodes = (columns: 'a): 'a => {
-  let columns: Dict.t<_> = Obj.magic(columns)
-
-  columns
-  ->Dict.toArray
-  ->Array.map(((key, value)) => (key, Unknown.make(value)))
-  ->Dict.fromArray
-  ->Obj.magic
-}

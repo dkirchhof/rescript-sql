@@ -36,7 +36,7 @@ let songsTable = table({
     },
 })
 
-let testTable: SchemaBuilder_Types.table<_, {.}> = table({
+let testTable = tableWithoutConstraints({
   moduleName: "Test",
   tableName: "test",
   columns: {
