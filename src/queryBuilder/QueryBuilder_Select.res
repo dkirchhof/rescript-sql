@@ -15,7 +15,7 @@ type columns2<'a, 'b> = {
   t2: 'b,
 }
 
-let from = (source: Source.t<'columns, _, _>): t<'columns, 'columns> => {
+let from = (source: Source.t<'columns, _, _, _>): t<'columns, 'columns> => {
   from: {name: source.name, alias: None},
   joins: [],
   where: None,
@@ -28,7 +28,7 @@ let from = (source: Source.t<'columns, _, _>): t<'columns, 'columns> => {
   _selectables: source.columns,
 }
 
-let _join1 = (q, source: Source.t<_, _, _>, getOn, joinType, _projectables) => {
+let _join1 = (q, source: Source.t<_, _, _, _>, getOn, joinType, _projectables) => {
   let _selectables = {
     t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._selectables, "t1"),
     t2: QueryBuilder_Utils.getColumnsWithTableAlias(source.columns, "t2"),
@@ -55,7 +55,7 @@ let _join1 = (q, source: Source.t<_, _, _>, getOn, joinType, _projectables) => {
   }
 }
 
-let innerJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, _, _>, getOn): t<
+let innerJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, _, _, _>, getOn): t<
   columns2<'p1, 'columns>,
   columns2<'s1, 'columns>,
 > =>
@@ -70,7 +70,7 @@ let innerJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, _, _>, getOn): t<
     },
   )
 
-let leftJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, 'nullColumns, _>, getOn): t<
+let leftJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, 'nullColumns, _, _>, getOn): t<
   columns2<'p1, 'nullColumns>,
   columns2<'s1, 'columns>,
 > =>
@@ -94,7 +94,6 @@ let groupBy = (q, getGroupBy) => {
   ...q,
   groupBy: getGroupBy(q._selectables),
 }
-
 
 let having = (q, getHaving) => {
   ...q,

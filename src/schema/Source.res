@@ -1,4 +1,4 @@
-type t<'columns, 'nullColumns, 'kind> = {
+type t<'columns, 'nullColumns, 'insert, 'update> = {
   name: string,
   columns: 'columns,
 }

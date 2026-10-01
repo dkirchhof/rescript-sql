@@ -65,15 +65,8 @@ let tableToSQL = (schema: SchemaBuilder_Types.table<_>) => {
 let viewToSQL = (schema: SchemaBuilder_Types.view<_>) => {
   open StringBuilder
 
-  let columns =
-    schema.columns
-    ->Obj.magic
-    ->Dict.valuesToArray
-    ->Array.map((column: SchemaBuilder_Types.column) => column.name)
-    ->Array.join(", ")
-
   make()
-  ->addS(0, `CREATE VIEW ${schema.viewName} (${columns}) AS`)
+  ->addS(0, `CREATE VIEW ${schema.viewName} AS`)
   ->addS(2, `${schema.sql};`)
   ->addE
   ->build("\n")
