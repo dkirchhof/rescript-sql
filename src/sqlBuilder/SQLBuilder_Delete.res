@@ -1,17 +1,6 @@
-let whereToSQL = (where, params) => {
-  SQLBuilder_Clause.toSQL("WHERE", where, SQLBuilder_Select.subqueryToSQL, params)
-}
+let toSQL = query => {
+  let renderer = SQLBuilder_Renderer.makeRenderer()
+  let sql = renderer.renderDelete(query)
 
-let toSQL = (q: QueryBuilder_Delete.t<_>): SQLBuilder_SQL.t => {
-  open StringBuilder
-
-  let params = []
-
-  let sql =
-    make()
-    ->addS(0, `DELETE FROM ${q.tableName}`)
-    ->addSO(0, whereToSQL(q.where, params))
-    ->build("\n")
-
-  {sql, params}
+  {SQLBuilder_SQL.sql, params: renderer.params}
 }
