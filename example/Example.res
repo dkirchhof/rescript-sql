@@ -228,6 +228,10 @@ let dql = async () => {
   ->where(c => eq(jsonExtract(c.json, "$.hello"), String("world")))
   ->selectAll
   ->logAndExecute
+
+  await from(Schema.Test.table)
+  ->select(c => {"helloCount": count(jsonExtract(c.json, "$.hello"))})
+  ->logAndExecute
 }
 
 await insertExample()

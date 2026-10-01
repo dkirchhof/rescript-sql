@@ -1,7 +1,3 @@
-let setJSONfunction = (node: string, jsonFunction) =>
-  switch Obj.magic(node) {
-  | Node.Column(column) => Node.Column({...column, jsonFunction})->Obj.magic
-  | _ => panic("only available for columns")
-  }
-
-let jsonExtract = (node, path): JSON.t => setJSONfunction(node, Extract(path))
+let jsonExtract = (node: string, path): JSON.t => {
+  Node.JsonExtract(Unknown.make(node), path)->Obj.magic
+}

@@ -1,30 +1,30 @@
-let toSQL = (node: Node.t<_>, subqueryToSQL, params) => {
+let rec toSQL = (node: Node.t<_>, subqueryToSQL, params) => {
   open SQLBuilder_Params
 
   switch node {
   | Column(column) => {
-      let columnName = switch column.tableAlias {
+      switch column.tableAlias {
       | Some(tableAlias) => `${tableAlias}.${column.name}`
       | None => column.name
       }
-
-      let columnName = switch column.aggregation {
-      | Some(Avg) => `AVG(${columnName})`
-      | Some(Count) => `COUNT(${columnName})`
-      | Some(Max) => `MAX(${columnName})`
-      | Some(Min) => `MIN(${columnName})`
-      | Some(Sum) => `SUM(${columnName})`
-      | None => columnName
+    }
+  | Aggregate(aggregation, operand) => {
+      let operand = toSQL(Node.fromUnknown(operand), subqueryToSQL, params)
+      let functionName = switch aggregation {
+      | Avg => "AVG"
+      | Count => "COUNT"
+      | Max => "MAX"
+      | Min => "MIN"
+      | Sum => "SUM"
       }
 
-      switch column.jsonFunction {
-      | Some(Extract(path)) => {
-          let sanitizedPath = String.replaceAllRegExp(path, /[^\w\$\.\[\]]/g, "")
+      `${functionName}(${operand})`
+    }
+  | JsonExtract(operand, path) => {
+      let operand = toSQL(Node.fromUnknown(operand), subqueryToSQL, params)
+      let path = param(params)(path)
 
-          `${columnName} ->> "${sanitizedPath}"`
-        }
-      | None => columnName
-      }
+      `(${operand} ->> ${path})`
     }
   | Value(value) => param(params)(value)
   | Subquery(subquery) => subqueryToSQL(subquery, params)
