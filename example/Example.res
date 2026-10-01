@@ -1,7 +1,7 @@
 let connection = BunSQLite.createConnection("sqlite://example/db.db")
 
 let insertExample = async () => {
-  open RescriptSQL.Insert
+  open Insert
 
   let logAndExecute = async query => {
     let sql = toSQL(query)
@@ -40,7 +40,7 @@ let insertExample = async () => {
 
 let crudExample = async () => {
   let create = async () => {
-    open RescriptSQL.Insert
+    open Insert
 
     let query = insertInto(Schema.Artists.table)->values([{id: 100, name: "DELETEME", genre: Null}])
     let sql = toSQL(query)
@@ -54,7 +54,7 @@ let crudExample = async () => {
   }
 
   let read = async () => {
-    open RescriptSQL.Select
+    open Select
 
     let query = from(Schema.Artists.table)->selectAll
     let sql = toSQL(query)
@@ -68,7 +68,7 @@ let crudExample = async () => {
   }
 
   let update = async () => {
-    open RescriptSQL.Update
+    open Update
 
     let query = update(Schema.Artists.table)->set({name: "DELETEME!!!"})->where(c => eq(c.id, 100))
     let sql = toSQL(query)
@@ -82,7 +82,7 @@ let crudExample = async () => {
   }
 
   let delete = async () => {
-    open RescriptSQL.Delete
+    open Delete
 
     let query = deleteFrom(Schema.Artists.table)->where(c => eq(c.id, 100))
     let sql = toSQL(query)
@@ -104,7 +104,7 @@ let crudExample = async () => {
 }
 
 let dql = async () => {
-  open RescriptSQL.Select
+  open Select
 
   let logAndExecute = async query => {
     let sql = toSQL(query)
