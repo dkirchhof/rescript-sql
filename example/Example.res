@@ -108,6 +108,7 @@ let crudExample = async () => {
 let dql = async () => {
   open RescriptSQL.Select
   open RescriptSQL.Expr
+  open RescriptSQL.Literal
   open RescriptSQL.GroupBy
   open RescriptSQL.OrderBy
   open! RescriptSQL.Agg

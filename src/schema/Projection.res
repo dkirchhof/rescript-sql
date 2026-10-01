@@ -1,7 +1,7 @@
-type t = Dict.t<Node.t>
+type t = dict<Node.t>
 
 let normalize = (projection: 'a): t => {
-  let fields: Dict.t<unknown> = Obj.magic(projection)
+  let fields: dict<unknown> = Obj.magic(projection)
 
   fields
   ->Dict.toArray

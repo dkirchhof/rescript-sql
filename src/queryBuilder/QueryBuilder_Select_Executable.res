@@ -1,3 +1,3 @@
 type t<'result> = {
-  ast: AST.selectEx,
+  ast: AST.selectExQuery,
 }

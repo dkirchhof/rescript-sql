@@ -1,6 +1,6 @@
 type renderer<'insert, 'columns, 'update, 'deleteColumns> = {
   params: array<unknown>,
-  renderSelect: (AST.selectEx, int) => string,
+  renderSelect: (AST.selectExQuery, int) => string,
   renderInsert: QueryBuilder_Insert.tx<'insert> => string,
   renderUpdate: QueryBuilder_Update.tx<'columns, 'update> => string,
   renderDelete: QueryBuilder_Delete.t<'deleteColumns> => string,
@@ -22,6 +22,15 @@ let makeRenderer = () => {
     }
   }
 
+  let literalToSQL = (literal: AST.literal) =>
+    switch literal {
+    | String(string) => `'${String.replaceAll(string, "'", "''")}'`
+    | Number(float) => Float.toString(float)
+    | True => "TRUE"
+    | False => "FALSE"
+    | Null => "NULL"
+    }
+
   let rec nodeToSQL = (node: Node.t) => {
     switch node {
     | Column(column) =>
@@ -29,7 +38,7 @@ let makeRenderer = () => {
       | Some(tableAlias) => `${tableAlias}.${column.name}`
       | None => column.name
       }
-    | Aggregate(aggregation, operand) => {
+    | Aggregation(aggregation, operand) => {
         let operand = nodeToSQL(operand)
         let functionName = switch aggregation {
         | Avg => "AVG"
@@ -48,7 +57,7 @@ let makeRenderer = () => {
         `(${operand} ->> ${path})`
       }
     | Value(value) => param(value)
-    | Literal(value) => EscapeValues.escape(value)
+    | Literal(value) => literalToSQL(value)
     | Subquery(query) => `(\n${renderSelect(query, 2)}\n)`
     | ProjectionGroup(_) => panic("projection groups must be rendered as fields")
     }
@@ -106,8 +115,8 @@ let makeRenderer = () => {
   }
   and whereToSQL = expression => clauseToSQL("WHERE", expression)
   and havingToSQL = expression => clauseToSQL("HAVING", expression)
-  and projectionToSQL = (projection: Dict.t<Node.t>) => {
-    let rec getFields = (projection: Dict.t<Node.t>, path) => {
+  and projectionToSQL = (projection: dict<Node.t>) => {
+    let rec getFields = (projection: dict<Node.t>, path) => {
       projection
       ->Dict.toArray
       ->Array.flatMap(((alias, node)) => {
@@ -146,7 +155,7 @@ let makeRenderer = () => {
       ->build(" ")
     })
   }
-  and groupByToSQL = (groupBys: array<QueryBuilder_GroupBy.t>) => {
+  and groupByToSQL = (groupBys: array<Node.t>) => {
     switch groupBys {
     | [] => None
     | _ => {
@@ -156,7 +165,7 @@ let makeRenderer = () => {
       }
     }
   }
-  and orderByToSQL = (orderBys: array<QueryBuilder_OrderBy.t>) => {
+  and orderByToSQL = (orderBys: array<AST.orderBy>) => {
     switch orderBys {
     | [] => None
     | _ => {
@@ -174,7 +183,7 @@ let makeRenderer = () => {
       }
     }
   }
-  and renderSelect = (q: AST.selectEx, indentation) => {
+  and renderSelect = (q: AST.selectExQuery, indentation) => {
     open StringBuilder
 
     let limitToSQL = limit => {
@@ -187,14 +196,14 @@ let makeRenderer = () => {
 
     make()
     ->addS(indentation, projectionToSQL(q.projection))
-    ->addS(indentation, fromToSQL(q.select.from))
-    ->addM(indentation, joinsToSQL(q.select.joins))
-    ->addSO(indentation, whereToSQL(q.select.where))
-    ->addSO(indentation, groupByToSQL(q.select.groupBy))
-    ->addSO(indentation, havingToSQL(q.select.having))
-    ->addSO(indentation, orderByToSQL(q.select.orderBy))
-    ->addSO(indentation, limitToSQL(q.select.limit))
-    ->addSO(indentation, offsetToSQL(q.select.offset))
+    ->addS(indentation, fromToSQL(q.selectQuery.from))
+    ->addM(indentation, joinsToSQL(q.selectQuery.joins))
+    ->addSO(indentation, whereToSQL(q.selectQuery.where))
+    ->addSO(indentation, groupByToSQL(q.selectQuery.groupBy))
+    ->addSO(indentation, havingToSQL(q.selectQuery.having))
+    ->addSO(indentation, orderByToSQL(q.selectQuery.orderBy))
+    ->addSO(indentation, limitToSQL(q.selectQuery.limit))
+    ->addSO(indentation, offsetToSQL(q.selectQuery.offset))
     ->build("\n")
   }
 

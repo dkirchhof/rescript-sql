@@ -1,5 +1,5 @@
 type t<'a, 'b> = {
-  ...AST.select,
+  ...AST.selectQuery,
   _projectables: 'a,
   _selectables: 'b,
 }
@@ -95,6 +95,7 @@ let groupBy = (q, getGroupBy) => {
   groupBy: getGroupBy(q._selectables),
 }
 
+
 let having = (q, getHaving) => {
   ...q,
   having: q._selectables->getHaving->Some,
@@ -117,7 +118,7 @@ let offset = (q, offset: int) => {
 
 let finalize = (q: t<_, _>, projection: 'result): QueryBuilder_Select_Executable.t<'result> => {
   ast: {
-    select: {
+    selectQuery: {
       from: q.from,
       joins: q.joins,
       where: q.where,

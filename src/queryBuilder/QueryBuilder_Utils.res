@@ -1,5 +1,5 @@
 let getColumnsWithTableAlias = (columns: 'a, tableAlias): 'a => {
-  let columns: Dict.t<Node.t> = Obj.magic(columns)
+  let columns: dict<Node.t> = Obj.magic(columns)
 
   columns
   ->Dict.toArray

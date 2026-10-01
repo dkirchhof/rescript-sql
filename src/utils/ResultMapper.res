@@ -1,5 +1,5 @@
 let map = (query: QueryBuilder_Select_Executable.t<'result>, row): 'result => {
-  let rec recMap = (projection: Dict.t<Node.t>, path) => {
+  let rec recMap = (projection: dict<Node.t>, path) => {
     let obj = Object.make()
 
     projection
@@ -11,7 +11,7 @@ let map = (query: QueryBuilder_Select_Executable.t<'result>, row): 'result => {
       | Node.ProjectionGroup(nodes) => Object.set(obj, key, recMap(nodes, `${fullKey}.`))
       | Node.Column(_)
       | Node.Subquery(_)
-      | Node.Aggregate(_, _)
+      | Node.Aggregation(_, _)
       | Node.JsonExtract(_, _) => Object.set(obj, key, Object.get(row, fullKey))
       | Node.Value(value) => Object.set(obj, key, value)
       | Node.Literal(value) => Object.set(obj, key, value)

@@ -2,19 +2,28 @@ type aggregation = Count | Sum | Avg | Min | Max
 type joinType = INNER | LEFT
 type direction = ASC | DESC
 
+@unboxed
+type literal =
+  | String(string)
+  | Number(float)
+  | @as(true) True
+  | @as(false) False
+  | @as(null) Null
+
 type source = {
   name: string,
   alias: option<string>,
 }
 
 type rec node =
-  | ProjectionGroup(Dict.t<node>)
+  | ProjectionGroup(dict<node>)
   | Column(Column.t)
-  | Subquery(selectEx)
+  | Subquery(selectExQuery)
   | Value(unknown)
-  | Literal(EscapeValues.t)
-  | Aggregate(aggregation, node)
+  | Literal(literal)
+  | Aggregation(aggregation, node)
   | JsonExtract(node, node)
+
 and predicate =
   | And(array<predicate>)
   | Or(array<predicate>)
@@ -32,26 +41,34 @@ and predicate =
   | NotLike(node, node)
   | ILike(node, node)
   | NotILike(node, node)
-and select = {
+
+and selectQuery = {
   from: source,
   joins: array<join>,
   where: option<predicate>,
-  groupBy: array<node>,
+  groupBy: array<groupBy>,
   having: option<predicate>,
   orderBy: array<orderBy>,
-  limit: option<node>,
-  offset: option<node>,
+  limit: option<limit>,
+  offset: option<offset>,
 }
-and selectEx = {
-  select: select,
-  projection: Dict.t<node>,
+
+and selectExQuery = {
+  selectQuery: selectQuery,
+  projection: dict<node>,
 }
+
 and join = {
   table: source,
   joinType: joinType,
   on: predicate,
 }
+
 and orderBy = {
   node: node,
   direction: direction,
 }
+
+and groupBy = node
+and limit = node
+and offset = node
