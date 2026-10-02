@@ -112,11 +112,11 @@ let dql = async () => {
     Logger.log(sql.sql)
     Logger.log(sql.params)
 
-    let result = await BunSQLite.exec(connection, sql.sql, sql.params)
+    let rows = await BunSQLite.exec(connection, sql.sql, sql.params)
 
-    // Logger.log(result)
+    // Logger.log(rows)
 
-    let mappedResult = Array.map(result, row => ResultMapper.map(query, row))
+    let mappedResult = RowsMapper.mapRows(query, rows)
 
     Logger.log(mappedResult)
   }
