@@ -22,6 +22,13 @@ let set = (q: t<_, 'update>, patch: 'update) => {
   where: None,
 }
 
+let setAll = (q: t<'columns, _>, patch: 'columns) => {
+  tableName: q.tableName,
+  columns: q.columns,
+  patch,
+  where: None,
+}
+
 let where = (q: tx<'columns, _>, getWhere) => {
   ...q,
   where: q.columns->getWhere->Some,
