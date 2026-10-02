@@ -210,19 +210,33 @@ let makeRenderer = () => {
   let renderInsert = (q: QueryBuilder_Insert.tx<_>) => {
     open StringBuilder
 
-    let columns = q.values[0]->Option.getOrThrow->Obj.magic->Dict.keysToArray->Array.join(", ")
+    let columns = q.values[0]->Option.getOrThrow->Obj.magic->Dict.keysToArray
 
     let rows = q.values->Array.map(row => {
-      let columns = row->Obj.magic->Dict.valuesToArray->Array.map(param)->Array.join(", ")
+      let columns = row->Obj.magic->Dict.valuesToArray->Array.map(param)
 
-      `(${columns})`
+      `(${Array.join(columns, ", ")})`
     })
 
     let values = make()->addM(2, rows)->build(",\n")
 
+    let onConflict = switch q.onConflict {
+    | Some(Nothing) => Some(`ON CONFLICT DO NOTHING`)
+    | Some(Update) => {
+        let patch =
+          columns
+          ->Array.map(columnName => `${columnName} = EXCLUDED.${columnName}`)
+          ->Array.join(", ")
+
+        Some(`ON CONFLICT DO UPDATE SET ${patch}`)
+      }
+    | None => None
+    }
+
     make()
-    ->addS(0, `INSERT INTO ${q.tableName}(${columns}) VALUES`)
+    ->addS(0, `INSERT INTO ${q.tableName}(${Array.join(columns, ", ")}) VALUES`)
     ->addS(0, values)
+    ->addSO(0, onConflict)
     ->build("\n")
   }
 
