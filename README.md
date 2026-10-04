@@ -15,7 +15,7 @@ $ npm install dkirchhof/rescript-sql
 
 ```json
  {
-   "bs-dependencies": [
+   "dependencies": [
 +    "rescript-sql"
    ]
  }
@@ -27,7 +27,7 @@ $ npm install dkirchhof/rescript-sql
 
 ```res
 // src/Schema_.res
-open SchemaBuilder
+open RescriptSQL.SchemaBuilder
 
 let artistsTable = table({
   moduleName: "Artists",
@@ -251,7 +251,7 @@ INNER JOIN songs AS song ON song.artistId = artists.id
 
 ### 5. Use the resulting sql and params to get data from your database:
 
-[!IMPORTANT]
+> [!IMPORTANT]
 > This library doesn't provide any bindings for databases. Use your own bindings to connect to your database and execute the queries.
 
 ```res
@@ -283,42 +283,42 @@ let query =
 
 let rows = await ...
 
-// [
-//   { '0.id': 1, '0.name': 'Artist 1', '0.genre': 'Rock', '1.id': 11, '1.artistId': 1, '1.name': 'Song 1_1' },
-//   { '0.id': 1, '0.name': 'Artist 1', '0.genre': 'Rock', '1.id': 12, '1.artistId': 1, '1.name': 'Song 1_2' },
-// ]
+[
+  { '0.id': 1, '0.name': 'Artist 1', '0.genre': 'Rock', '1.id': 11, '1.artistId': 1, '1.name': 'Song 1_1' },
+  { '0.id': 1, '0.name': 'Artist 1', '0.genre': 'Rock', '1.id': 12, '1.artistId': 1, '1.name': 'Song 1_2' },
+]
 
 let result = RowsMapper.mapRows(query, rows)
 
 // mapped row type = (Schema.Artists.columns, Schema.Songs.columns)
 
-// [
-//   {
-//     '0': { id: 1, name: 'Artist 1', genre: 'Rock' },
-//     '1': { id: 11, artistId: 1, name: 'Song 1_1' }
-//   },
-//   {
-//     '0': { id: 1, name: 'Artist 1', genre: 'Rock' },
-//     '1': { id: 12, artistId: 1, name: 'Song 1_2' }
-//   }
-// ]
+[
+  {
+    '0': { id: 1, name: 'Artist 1', genre: 'Rock' },
+    '1': { id: 11, artistId: 1, name: 'Song 1_1' }
+  },
+  {
+    '0': { id: 1, name: 'Artist 1', genre: 'Rock' },
+    '1': { id: 12, artistId: 1, name: 'Song 1_2' }
+  }
+]
 ```
 
 Example 2:
 
 ```res
-// let query =
-//   from(Schema.Artists.table)
-//     ->innerJoin1(Schema.Songs.table, "s", ((a, s)) => eq(s.artistId, a.id))
-//     ->select(((a, s)) => {"artist": {"name": a.name}, "song": {"name": s.name}})
-//     ->logAndExecute
+let query =
+  from(Schema.Artists.table)
+    ->innerJoin1(Schema.Songs.table, "s", ((a, s)) => eq(s.artistId, a.id))
+    ->select(((a, s)) => {"artist": {"name": a.name}, "song": {"name": s.name}})
+    ->logAndExecute
 
 let rows = await ...
 
-// [
-//   { 'artist.name': 'Artist 1', 'song.name': 'Song 1_1' },
-//   { 'artist.name': 'Artist 1', 'song.name': 'Song 1_2' },
-// ]
+[
+  { 'artist.name': 'Artist 1', 'song.name': 'Song 1_1' },
+  { 'artist.name': 'Artist 1', 'song.name': 'Song 1_2' },
+]
 
 let result = RowsMapper.mapRows(query, rows)
 
