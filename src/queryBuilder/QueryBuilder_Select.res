@@ -4,15 +4,15 @@ type t<'a, 'b> = {
   _selectables: 'b,
 }
 
+type columns2<'a, 'b> = {
+  t1: 'a,
+  t2: 'b,
+}
+
 type columns3<'a, 'b, 'c> = {
   t1: 'a,
   t2: 'b,
   t3: 'c,
-}
-
-type columns2<'a, 'b> = {
-  t1: 'a,
-  t2: 'b,
 }
 
 let from = (source: Source.t<'columns, _, _, _>): t<'columns, 'columns> => {
@@ -55,6 +55,37 @@ let _join1 = (q, source: Source.t<_, _, _, _>, getOn, joinType, _projectables) =
   }
 }
 
+let _join2 = (
+  q: t<columns2<_>, columns2<_>>,
+  source: Source.t<_, _, _, _>,
+  getOn,
+  joinType,
+  _projectables,
+) => {
+  let _selectables = {
+    t1: q._selectables.t1,
+    t2: q._selectables.t2,
+    t3: QueryBuilder_Utils.getColumnsWithTableAlias(source.columns, "t3"),
+  }
+
+  {
+    ...q,
+    joins: [
+      ...q.joins,
+      {
+        table: {
+          name: source.name,
+          alias: Some("t3"),
+        },
+        joinType,
+        on: getOn(_selectables),
+      },
+    ],
+    _projectables,
+    _selectables,
+  }
+}
+
 let innerJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, _, _, _>, getOn): t<
   columns2<'p1, 'columns>,
   columns2<'s1, 'columns>,
@@ -70,6 +101,23 @@ let innerJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, _, _, _>, getOn): t
     },
   )
 
+let innerJoin2 = (
+  q: t<columns2<'p1, 'p2>, columns2<'s1, 's2>>,
+  source: Source.t<'columns, _, _, _>,
+  getOn,
+): t<columns3<'p1, 'p2, 'columns>, columns3<'s1, 's2, 'columns>> =>
+  _join2(
+    q,
+    source,
+    getOn,
+    INNER,
+    {
+      t1: q._projectables.t1,
+      t2: q._projectables.t2,
+      t3: QueryBuilder_Utils.getColumnsWithTableAlias(Obj.magic(source.columns), "t3"),
+    },
+  )
+
 let leftJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, 'nullColumns, _, _>, getOn): t<
   columns2<'p1, 'nullColumns>,
   columns2<'s1, 'columns>,
@@ -82,6 +130,23 @@ let leftJoin1 = (q: t<'p1, 's1>, source: Source.t<'columns, 'nullColumns, _, _>,
     {
       t1: QueryBuilder_Utils.getColumnsWithTableAlias(q._projectables, "t1"),
       t2: QueryBuilder_Utils.getColumnsWithTableAlias(Obj.magic(source.columns), "t2"),
+    },
+  )
+
+let leftJoin2 = (
+  q: t<columns2<'p1, 'p2>, columns2<'s1, 's2>>,
+  source: Source.t<'columns, 'nullColumns, _, _>,
+  getOn,
+): t<columns3<'p1, 'p2, 'nullColumns>, columns3<'s1, 's2, 'columns>> =>
+  _join2(
+    q,
+    source,
+    getOn,
+    LEFT,
+    {
+      t1: q._projectables.t1,
+      t2: q._projectables.t2,
+      t3: QueryBuilder_Utils.getColumnsWithTableAlias(Obj.magic(source.columns), "t3"),
     },
   )
 
@@ -137,7 +202,7 @@ let selectAll = (q: t<'projectables, _>): QueryBuilder_Select_Executable.t<'proj
 
 let select = (
   q: t<'projectables, _>,
-  getProjection: 'projectables => ({..} as 'projection),
+  getProjection: 'projectables => 'projection,
 ): QueryBuilder_Select_Executable.t<'projection> => {
   finalize(q, getProjection(q._projectables))
 }
