@@ -311,7 +311,6 @@ let query =
   from(Schema.Artists.table)
     ->innerJoin1(Schema.Songs.table, "s", ((a, s)) => eq(s.artistId, a.id))
     ->select(((a, s)) => {"artist": {"name": a.name}, "song": {"name": s.name}})
-    ->logAndExecute
 
 let rows = await ...
 
