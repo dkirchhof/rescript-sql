@@ -1,6 +1,6 @@
 let columnToSQL = (column: SchemaBuilder_Types.column) => {
   let sizeString = switch column.size {
-  | Some(size) => `(${size->Belt.Int.toString})`
+  | Some(size) => `(${size->Int.toString})`
   | None => ""
   }
 

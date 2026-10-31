@@ -98,6 +98,11 @@ let where = (q, getWhere) => {
   where: q._selectables->getWhere->Some,
 }
 
+let whereO = (q, getWhere) => {
+  ...q,
+  where: q._selectables->getWhere,
+}
+
 let groupBy = (q, getGroupBy) => {
   ...q,
   groupBy: getGroupBy(q._selectables),
